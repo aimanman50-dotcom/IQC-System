@@ -1,0 +1,3252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f4c81" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IQC 1.0 App" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>IQC System — Incoming Quality Control Inspection Record (AQL 1.0)</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --primary: #0f4c81;
+      --primary-hover: #0c3b66;
+      --primary-light: #e0f2fe;
+      --accent: #0284c7;
+      --pass-bg: #dcfce7;
+      --pass-text: #166534;
+      --pass-border: #86efac;
+      --reject-bg: #fee2e2;
+      --reject-text: #991b1b;
+      --reject-border: #fca5a5;
+      --hold-bg: #fef3c7;
+      --hold-text: #92400e;
+      --hold-border: #fcd34d;
+      --sort-bg: #ede9fe;
+      --sort-text: #5b21b6;
+      --sort-border: #c4b5fd;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, #0f172a 0%, #0f4c81 100%);
+      color: #ffffff;
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-badge {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: #bae6fd;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-accent {
+      background: #0ea5e9;
+      color: #ffffff;
+    }
+    .btn-accent:hover {
+      background: #0284c7;
+    }
+
+    .btn-sort {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #f59e0b;
+    }
+    .btn-sort:hover {
+      background: #fde68a;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      background: var(--surface-alt);
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #ffffff;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1460px;
+      margin: 20px auto;
+      padding: 0 20px 40px;
+    }
+
+    /* KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+    }
+
+    .kpi-value {
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .kpi-pass .kpi-value { color: var(--pass-text); }
+    .kpi-reject .kpi-value { color: var(--reject-text); }
+    .kpi-hold .kpi-value { color: var(--hold-text); }
+    .kpi-aql .kpi-value { color: var(--primary); }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: rgba(15, 76, 129, 0.05);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Layout Panels */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Form Grid */
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin: 18px 0 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .form-section-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group.span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 640px) {
+      .form-group.span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    label .req {
+      color: #dc2626;
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13.5px;
+      color: var(--text);
+      background: #ffffff;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    input[readonly] {
+      background: var(--surface-alt);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* AQL Box */
+    .aql-Banner {
+      background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .aql-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .aql-pill {
+      background: #ffffff;
+      border: 1px solid #7dd3fc;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+    }
+
+    .aql-pill strong {
+      font-size: 15px;
+      color: var(--primary);
+      margin-left: 4px;
+    }
+
+    /* Sorting Box */
+    .sorting-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 8px;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .status-PASS {
+      background: var(--pass-bg);
+      color: var(--pass-text);
+      border: 1px solid var(--pass-border);
+    }
+
+    .status-REJECT {
+      background: var(--reject-bg);
+      color: var(--reject-text);
+      border: 1px solid var(--reject-border);
+    }
+
+    .status-HOLD {
+      background: var(--hold-bg);
+      color: var(--hold-text);
+      border: 1px solid var(--hold-border);
+    }
+
+    .badge-sorted {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--sort-bg);
+      color: var(--sort-text);
+      border: 1px solid var(--sort-border);
+      margin-top: 4px;
+    }
+
+    /* Parameter Checklist Table */
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .param-table th,
+    .param-table td {
+      border: 1px solid var(--border-light);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .param-table th {
+      background: var(--surface-alt);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* Defect Items List */
+    .defect-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 2fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+      background: var(--surface-alt);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+    }
+
+    @media (max-width: 768px) {
+      .defect-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Photo Upload Zone */
+    .photo-dropzone {
+      border: 2px dashed #94a3b8;
+      background: var(--surface-alt);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .photo-dropzone:hover {
+      border-color: var(--accent);
+      background: #f0f9ff;
+    }
+
+    .photo-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .photo-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+
+    .photo-card-body {
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .photo-card-body input,
+    .photo-card-body select {
+      font-size: 11.5px;
+      padding: 4px 6px;
+    }
+
+    .photo-remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(220, 38, 38, 0.9);
+      color: #ffffff;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Filter Bar & Data Table */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .filter-inputs input,
+    .filter-inputs select {
+      max-width: 220px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      border-bottom: 1px solid var(--border-light);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .num-col {
+      text-align: right !important;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .thumb-mini {
+      width: 42px;
+      height: 42px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .thumb-stack {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Modal / Printable Report & Quick Sorting Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 10px;
+      max-width: 920px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-content.modal-md {
+      max-width: 680px;
+    }
+
+    .modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-alt);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .lot-summary-banner {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Print Report Styling */
+    .report-sheet {
+      border: 2px solid #0f172a;
+      padding: 20px;
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .report-cell {
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 12.5px;
+    }
+
+    .report-cell .lbl {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      color: #475569;
+      font-weight: 700;
+      display: block;
+    }
+
+    .report-cell .val {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 13px;
+    }
+
+    .report-photos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .report-photo-box {
+      border: 1px solid #cbd5e1;
+      padding: 6px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .report-photo-box img {
+      width: 100%;
+      height: 135px;
+      object-fit: contain;
+      background: #f8fafc;
+    }
+
+    .report-signatures {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 28px;
+      padding-top: 12px;
+    }
+
+    .sig-box {
+      border-top: 1px solid #0f172a;
+      padding-top: 6px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #reportModal,
+      #reportModal * {
+        visibility: visible;
+      }
+      #reportModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: none;
+        padding: 0;
+      }
+      .modal-header {
+        display: none !important;
+      }
+      .modal-content {
+        box-shadow: none;
+        max-height: none;
+        overflow: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="app-header">
+    <div class="brand-group">
+      <div class="brand-badge">IQC 1.0</div>
+      <div class="brand-title">
+        <h1>Incoming Quality Control (IQC) Inspection Record System</h1>
+        <p>ISO 2859-1 / ANSI/ASQ Z1.4 Sampling Plan (Level II — AQL 1.0) + Anytime Edit & 100% Sorting Update</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-header" onclick="switchTab('tab-records')">📋 Inspection Log</button>
+      <button class="btn btn-header" onclick="switchTab('tab-form')">➕ New Inspection</button>
+      <button class="btn btn-header" onclick="switchTab('tab-aql')">📐 AQL 1.0 Table</button>
+      <button class="btn btn-sort" id="cloudSyncHeaderBtn" onclick="openCloudSyncModal()">☁️ Link Phone & Laptop (Cloud Sync)</button>
+      <button class="btn btn-header" onclick="syncFromCloud(true)" title="Pull latest records from Cloud">🔄 Sync Now</button>
+      <button class="btn btn-accent" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="btn btn-header" onclick="exportJSON()">💾 Backup</button>
+      <button class="btn btn-header" onclick="document.getElementById('importJsonInput').click()">📂 Import</button>
+      <input type="file" id="importJsonInput" accept=".json" style="display:none" onchange="importJSONFile(event)" />
+      <button class="btn btn-header" id="installAppBtn" onclick="openAppInstallModal()">📲 Install App</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- KPI SUMMARY CARDS -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Lots Inspected</span>
+        <span class="kpi-value" id="kpiTotalLots">0</span>
+        <span class="kpi-sub" id="kpiTotalQty">0 total units inspected</span>
+      </div>
+      <div class="kpi-card kpi-pass">
+        <span class="kpi-label">Accepted Lots (PASS / LAR %)</span>
+        <span class="kpi-value" id="kpiPassRate">0%</span>
+        <span class="kpi-sub" id="kpiPassCount">0 lots accepted</span>
+      </div>
+      <div class="kpi-card kpi-reject">
+        <span class="kpi-label">Rejected Lots (REJECT / NCR)</span>
+        <span class="kpi-value" id="kpiRejectCount">0</span>
+        <span class="kpi-sub" id="kpiDefectTotal">0 total defects found</span>
+      </div>
+      <div class="kpi-card kpi-hold">
+        <span class="kpi-label">100% Sorted / Re-Checked Lots</span>
+        <span class="kpi-value" id="kpiSortingCount">0</span>
+        <span class="kpi-sub" id="kpiSortingTime">0 mins total sorting time</span>
+      </div>
+      <div class="kpi-card kpi-aql">
+        <span class="kpi-label">Active AQL Standard</span>
+        <span class="kpi-value">AQL 1.0</span>
+        <span class="kpi-sub">ISO 2859-1 Level II (Normal)</span>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" id="btn-tab-records" onclick="switchTab('tab-records')">
+        📋 Incoming Inspection Log
+      </button>
+      <button class="tab-btn" id="btn-tab-form" onclick="switchTab('tab-form')">
+        ➕ New / Edit IQC Record
+      </button>
+      <button class="tab-btn" id="btn-tab-vendors" onclick="switchTab('tab-vendors')">
+        🏭 Vendor & Commodity Scorecard
+      </button>
+      <button class="tab-btn" id="btn-tab-aql" onclick="switchTab('tab-aql')">
+        📐 AQL 1.0 Reference & Calculator
+      </button>
+    </nav>
+
+    <!-- TAB 1: INSPECTION RECORDS LOG -->
+    <section class="tab-panel active" id="tab-records">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📋 Incoming Inspection Record Log</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+              💡 Tip: If an already-recorded or <strong>PASS</strong> lot requires a <strong>100% Sorting / Check</strong> later, click <strong>⚡ 100% Sort / Edit</strong> or <strong>✏️ Edit Record</strong> on that row anytime.
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="openNewForm()">➕ Add Inspection Record</button>
+            <button class="btn btn-outline btn-sm" onclick="resetDemoData()">🔄 Reset Sample Data</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-inputs">
+            <input type="text" id="searchInput" placeholder="🔍 Search IQC No, Vendor, Part, PO..." oninput="renderRecordsTable()" />
+            <select id="filterCommodity" onchange="renderRecordsTable()">
+              <option value="">All Commodities</option>
+              <option value="Plastic / Injection">Plastic / Injection</option>
+              <option value="Metal / Stamping">Metal / Stamping</option>
+              <option value="Electronic / PCB">Electronic / PCB</option>
+              <option value="Packaging / Carton">Packaging / Carton</option>
+              <option value="Chemical / Raw Material">Chemical / Raw Material</option>
+              <option value="Mechanical / Fastener">Mechanical / Fastener</option>
+              <option value="Others">Others</option>
+            </select>
+            <select id="filterStatus" onchange="renderRecordsTable()">
+              <option value="">All Judgments (Status)</option>
+              <option value="PASS">PASS (Accepted)</option>
+              <option value="REJECT">REJECT (Rejected / NCR)</option>
+              <option value="HOLD">HOLD (On-Hold / Sorting)</option>
+            </select>
+            <select id="filterSorting" onchange="renderRecordsTable()">
+              <option value="">All Sorting States</option>
+              <option value="SORTED_ONLY">Has 100% Sorting / Re-Check</option>
+              <option value="NO_SORTING">No 100% Sorting Yet</option>
+            </select>
+          </div>
+          <div style="font-size:12.5px; color:var(--text-muted);" id="recordCountLabel">Showing 0 records</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>IQC No. & Date</th>
+                <th>Vendor Name</th>
+                <th>Commodity & Part</th>
+                <th class="num-col">Lot Qty</th>
+                <th class="num-col">Sample (AQL 1.0)</th>
+                <th class="num-col">Ac / Re</th>
+                <th class="num-col">Defect Qty</th>
+                <th>Defect Details</th>
+                <th>100% Sorting (When & Time Taken)</th>
+                <th>Material Photos</th>
+                <th>Judgment</th>
+                <th>Edit / Sorting Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: ADD / EDIT IQC INSPECTION FORM -->
+    <section class="tab-panel" id="tab-form">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="formHeaderTitle">➕ Incoming Quality Control (IQC) Inspection Form</div>
+          <button class="btn btn-outline btn-sm" onclick="resetForm()">🧹 Clear Form</button>
+        </div>
+
+        <form id="iqcForm" onsubmit="saveRecord(event)">
+          <input type="hidden" id="editRecordId" value="" />
+
+          <!-- SECTION 1: RECEIVING, VENDOR & COMMODITY DETAILS -->
+          <div class="form-section-title">
+            <span>1. Receiving, Vendor & Commodity Details</span>
+            <span>Standard: ISO 2859-1</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>IQC Reference No. <span class="req">*</span></label>
+              <input type="text" id="iqcNo" required placeholder="e.g. IQC-20261014-001" />
+            </div>
+            <div class="form-group">
+              <label>Inspection Date <span class="req">*</span></label>
+              <input type="date" id="inspectionDate" required />
+            </div>
+            <div class="form-group">
+              <label>Vendor Name <span class="req">*</span></label>
+              <input type="text" id="vendorName" list="vendorSuggestions" required placeholder="e.g. TechPlast Industries Sdn Bhd" />
+              <datalist id="vendorSuggestions">
+                <option value="TechPlast Industries Sdn Bhd"></option>
+                <option value="Sinaran Metal Stamping Sdn Bhd"></option>
+                <option value="MicroChip Semi Components"></option>
+                <option value="Johor Pack & Print Sdn Bhd"></option>
+                <option value="Precision Fasteners Supply"></option>
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label>Commodity <span class="req">*</span></label>
+              <select id="commodity" required>
+                <option value="Plastic / Injection">Plastic / Injection</option>
+                <option value="Metal / Stamping">Metal / Stamping</option>
+                <option value="Electronic / PCB">Electronic / PCB</option>
+                <option value="Packaging / Carton">Packaging / Carton</option>
+                <option value="Chemical / Raw Material">Chemical / Raw Material</option>
+                <option value="Mechanical / Fastener">Mechanical / Fastener</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Part Number (Part No.) <span class="req">*</span></label>
+              <input type="text" id="partNo" required placeholder="e.g. INJ-CVR-402A" />
+            </div>
+            <div class="form-group">
+              <label>Part Description <span class="req">*</span></label>
+              <input type="text" id="partName" required placeholder="e.g. Front Housing ABS Black" />
+            </div>
+            <div class="form-group">
+              <label>PO / DO / Invoice No.</label>
+              <input type="text" id="poDoNo" placeholder="e.g. PO-88412 / DO-1092" />
+            </div>
+            <div class="form-group">
+              <label>Supplier Lot / Batch No.</label>
+              <input type="text" id="lotNo" placeholder="e.g. LOT-202610-A1" />
+            </div>
+          </div>
+
+          <!-- SECTION 2: QUANTITY & AUTOMATIC AQL 1.0 CALCULATION -->
+          <div class="form-section-title">
+            <span>2. Quantity (Qty) & Automatic AQL 1.0 Sampling Calculation</span>
+            <span>General Inspection Level II (Normal)</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Received Lot Quantity (Lot Qty) <span class="req">*</span></label>
+              <input type="number" id="lotQty" min="1" required placeholder="e.g. 1500" oninput="recalculateAQL()" />
+            </div>
+            <div class="form-group">
+              <label>Unit of Measure (UOM)</label>
+              <select id="uom">
+                <option value="PCS">PCS (Pieces)</option>
+                <option value="SET">SET</option>
+                <option value="ROLL">ROLL</option>
+                <option value="BOX">BOX / CARTON</option>
+                <option value="KG">KG</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>AQL 1.0 Sampling Mode</label>
+              <select id="aqlMode" onchange="recalculateAQL()">
+                <option value="iso_arrow">ISO 2859-1 Level II (AQL 1.0 Standard)</option>
+                <option value="100_pct">100% Inspection (100% Sorting)</option>
+                <option value="custom">Manual / Custom Sampling</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Sample Size Code Letter</label>
+              <input type="text" id="sampleCode" readonly value="-" />
+            </div>
+            <div class="form-group">
+              <label>Inspected Sample Size (n) <span class="req">*</span></label>
+              <input type="number" id="sampleSize" min="1" required oninput="evaluateJudgment()" />
+            </div>
+            <div class="form-group">
+              <label>Accept Limit (Ac — Max Allowed)</label>
+              <input type="number" id="aqlAc" min="0" required oninput="evaluateJudgment()" />
+            </div>
+            <div class="form-group">
+              <label>Reject Limit (Re — Min Reject)</label>
+              <input type="number" id="aqlRe" min="1" required oninput="evaluateJudgment()" />
+            </div>
+            <div class="form-group">
+              <label>Supplier COA / RoHS Certificate</label>
+              <select id="coaStatus">
+                <option value="Complete (Attached)">Complete (Attached)</option>
+                <option value="Missing COA">Missing COA</option>
+                <option value="Not Applicable (N/A)">Not Applicable (N/A)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="aql-Banner">
+            <div class="aql-metrics">
+              <div class="aql-pill">Standard: <strong>AQL 1.0</strong></div>
+              <div class="aql-pill">Code Letter: <strong id="bannerCode">-</strong></div>
+              <div class="aql-pill">Sample Size (n): <strong id="bannerSample">0</strong></div>
+              <div class="aql-pill">Accept (Ac): <strong id="bannerAc" style="color:var(--pass-text);">0</strong></div>
+              <div class="aql-pill">Reject (Re): <strong id="bannerRe" style="color:var(--reject-text);">1</strong></div>
+            </div>
+            <div id="aqlRuleHint" style="font-size:12px; color:var(--text-muted); font-weight:600;">
+              Enter Lot Qty to automatically calculate the AQL 1.0 sample size and Ac/Re limits.
+            </div>
+          </div>
+
+          <!-- SECTION 3: PARAMETER CHECKLIST & DEFECT DETAILS -->
+          <div class="form-section-title">
+            <span>3. Inspection Parameter Checklist & Defect Breakdown</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="addDefectRow()">➕ Add Defect Item</button>
+          </div>
+
+          <table class="param-table" style="margin-bottom: 14px;">
+            <thead>
+              <tr>
+                <th>Inspection Parameter</th>
+                <th>Inspection Method / Tool</th>
+                <th>Check Result</th>
+                <th>Specification / Actual Measurement Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Visual / Cosmetic Inspection</strong></td>
+                <td>Visual (Naked Eye / 1000 Lux Lighting)</td>
+                <td>
+                  <select id="chkVisual">
+                    <option value="PASS">PASS (Within Spec)</option>
+                    <option value="FAIL">FAIL (Non-Conforming)</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </td>
+                <td><input type="text" id="rmkVisual" placeholder="No scratches, burrs, flash, or discoloration..." /></td>
+              </tr>
+              <tr>
+                <td><strong>2. Dimensional Inspection</strong></td>
+                <td>Vernier Caliper / Micrometer / Pin Gauge</td>
+                <td>
+                  <select id="chkDimension">
+                    <option value="PASS">PASS (Within Tolerance)</option>
+                    <option value="FAIL">FAIL (Out of Spec)</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </td>
+                <td><input type="text" id="rmkDimension" placeholder="e.g. Length 45.02mm (±0.10mm), Thickness 2.00mm" /></td>
+              </tr>
+              <tr>
+                <td><strong>3. Fit & Functional Check</strong></td>
+                <td>Mating Gauge / Go-No-Go / Functional Test</td>
+                <td>
+                  <select id="chkFunction">
+                    <option value="PASS">PASS (Functions Properly)</option>
+                    <option value="FAIL">FAIL (Test Failed)</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </td>
+                <td><input type="text" id="rmkFunction" placeholder="e.g. Smooth snap-fit assembly with mating part" /></td>
+              </tr>
+              <tr>
+                <td><strong>4. Packaging & Labeling Check</strong></td>
+                <td>Visual & Barcode / Lot Verification</td>
+                <td>
+                  <select id="chkPackaging">
+                    <option value="PASS">PASS (Intact & Correct)</option>
+                    <option value="FAIL">FAIL (Damaged / Wrong Label)</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </td>
+                <td><input type="text" id="rmkPackaging" placeholder="e.g. Carton intact, clear FIFO & RoHS labels" /></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div id="defectRowsContainer"></div>
+
+          <div class="form-grid" style="margin-top: 12px;">
+            <div class="form-group">
+              <label>Total Defect Quantity <span class="req">*</span></label>
+              <input type="number" id="totalDefectQty" min="0" value="0" readonly />
+            </div>
+            <div class="form-group">
+              <label>Sample Defect Rate (%)</label>
+              <input type="text" id="defectRatePct" value="0.00%" readonly />
+            </div>
+            <div class="form-group">
+              <label>Inspection Judgment <span class="req">*</span></label>
+              <select id="judgmentStatus" onchange="updateStatusStyle()">
+                <option value="PASS">PASS — Accepted (Meets AQL 1.0)</option>
+                <option value="REJECT">REJECT — Rejected (Exceeds AQL 1.0)</option>
+                <option value="HOLD">HOLD — On Hold (Pending MRB / Sorting)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Lot Disposition / Follow-Up Action</label>
+              <select id="dispositionAction">
+                <option value="Release to Warehouse / Production Stock">Release to Warehouse / Production Stock</option>
+                <option value="Release After 100% Sorting (Post-Inspection Check)">Release After 100% Sorting (Post-Inspection Check)</option>
+                <option value="Issue NCR / Return to Vendor (RTV)">Issue NCR / Return to Vendor (RTV)</option>
+                <option value="100% Sorting by Vendor / IQC">100% Sorting by Vendor / IQC</option>
+                <option value="Conditional Accept (Concession / Waiver)">Conditional Accept (Concession / Waiver)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SECTION 4: 100% SORTING RECORD (WHEN & TIME TAKEN) -->
+          <div class="form-section-title">
+            <span>4. 100% Sorting / Post-Inspection Check (When & Time Taken)</span>
+            <span>Can be added during IQC or edited later for Passed/Recorded lots</span>
+          </div>
+
+          <div class="sorting-box">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>100% Sorting Status</label>
+                <select id="sortingStatus" onchange="handleSortingStatusChange()">
+                  <option value="Not Required">Not Required (Normal AQL Pass)</option>
+                  <option value="Completed (During IQC)">Completed (During IQC)</option>
+                  <option value="Completed (Post-Pass / Line Issue)">Completed (Post-Pass / Line Issue)</option>
+                  <option value="In Progress">In Progress (Ongoing 100% Check)</option>
+                  <option value="Pending Vendor">Pending Vendor Sorting</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Trigger / Reason for 100% Check</label>
+                <input type="text" id="sortingReason" list="sortingReasonList" placeholder="e.g. Line issue found after Pass / MRB Hold" />
+                <datalist id="sortingReasonList">
+                  <option value="Production Line Issue Found After Initial Pass"></option>
+                  <option value="AQL Sample Exceeded Limit — 100% Screening"></option>
+                  <option value="Vendor Quality Alert / Batch Recall Check"></option>
+                  <option value="Customer / Sub-Assembly Feedback"></option>
+                  <option value="Critical Part — Mandatory 100% Check"></option>
+                </datalist>
+              </div>
+              <div class="form-group">
+                <label>Sorting Date (When)</label>
+                <input type="date" id="sortingDate" />
+              </div>
+              <div class="form-group">
+                <label>Start Time</label>
+                <input type="time" id="sortingStartTime" oninput="calculateSortingDuration()" />
+              </div>
+              <div class="form-group">
+                <label>End Time</label>
+                <input type="time" id="sortingEndTime" oninput="calculateSortingDuration()" />
+              </div>
+              <div class="form-group">
+                <label>Time Taken (Duration)</label>
+                <input type="text" id="sortingTimeTaken" placeholder="e.g. 2 hrs 30 mins (150 mins)" />
+              </div>
+              <div class="form-group">
+                <label>Sorted By (PIC / Team)</label>
+                <select id="sortedBy">
+                  <option value="N/A">N/A</option>
+                  <option value="IQC Inspector Team">IQC Inspector Team</option>
+                  <option value="Vendor Rework Team">Vendor Rework Team</option>
+                  <option value="Joint IQC & Vendor">Joint IQC & Vendor</option>
+                  <option value="Production Support">Production Support</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Sorted Good Qty (OK)</label>
+                <input type="number" id="sortingOkQty" min="0" placeholder="e.g. 1985" oninput="syncSortingNgFromOk()" />
+              </div>
+              <div class="form-group">
+                <label>Sorted Reject Qty (NG)</label>
+                <input type="number" id="sortingNgQty" min="0" placeholder="e.g. 15" />
+              </div>
+              <div class="form-group span-2">
+                <label>100% Sorting Remarks / Findings</label>
+                <input type="text" id="sortingRemarks" placeholder="e.g. 15 pcs found with hairline crack during 100% check; remaining 1,985 pcs OK." />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: INCOMING MATERIAL & DEFECT PHOTOS -->
+          <div class="form-section-title">
+            <span>5. Incoming Material & Defect Evidence Photos</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="addSampleSvgPhoto()">🖼️ Generate Sample Photo</button>
+          </div>
+
+          <div class="photo-dropzone" onclick="document.getElementById('photoFileInput').click()">
+            <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)" />
+            <div style="font-size:24px; margin-bottom:6px;">📷</div>
+            <div style="font-weight:700; color:var(--primary);">Click to Upload Incoming Material / Defect Photos</div>
+            <div style="font-size:12px; color:var(--text-muted);">Supports phone camera capture or desktop image files (JPG, PNG, WebP). Images are auto-compressed for fast storage.</div>
+          </div>
+
+          <div class="photo-gallery" id="formPhotoGallery"></div>
+
+          <!-- SECTION 6: INSPECTOR SIGN-OFF & REMARKS -->
+          <div class="form-section-title">
+            <span>6. Inspector Sign-Off & Additional Remarks</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Inspected By (IQC Inspector) <span class="req">*</span></label>
+              <input type="text" id="inspectorName" required placeholder="e.g. Mohd Faiz (IQC)" />
+            </div>
+            <div class="form-group">
+              <label>Verified By (QA Leader / Engineer)</label>
+              <input type="text" id="verifiedBy" placeholder="e.g. Nurul Huda (QA Eng)" />
+            </div>
+            <div class="form-group">
+              <label>NCR / SCAR Ref No. (If Reject/Hold)</label>
+              <input type="text" id="ncrNo" placeholder="e.g. NCR-2026-019 (Leave blank if Pass)" />
+            </div>
+            <div class="form-group span-2">
+              <label>Inspection Remarks / Notes</label>
+              <input type="text" id="remarks" placeholder="Enter any additional remarks, waiver references, or inspection findings..." />
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid var(--border-light);">
+            <button type="button" class="btn btn-outline" onclick="switchTab('tab-records')">Cancel</button>
+            <button type="submit" class="btn btn-primary">💾 Save IQC Inspection Record</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 3: VENDOR & COMMODITY PERFORMANCE -->
+    <section class="tab-panel" id="tab-vendors">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏭 Vendor Quality Performance Scorecard</div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Vendor Name</th>
+                <th>Primary Commodity</th>
+                <th class="num-col">Total Lots</th>
+                <th class="num-col">Total Lot Qty</th>
+                <th class="num-col">Accepted (PASS)</th>
+                <th class="num-col">Rejected (REJECT)</th>
+                <th class="num-col">100% Sorted Lots</th>
+                <th class="num-col">Lot Acceptance Rate (LAR %)</th>
+                <th>Supplier Quality Rating</th>
+              </tr>
+            </thead>
+            <tbody id="vendorScorecardBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: AQL 1.0 REFERENCE TABLE -->
+    <section class="tab-panel" id="tab-aql">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📐 Official AQL 1.0 Reference Table — ISO 2859-1 / ANSI/ASQ Z1.4 (General Inspection Level II, Normal)</div>
+        </div>
+        <p style="margin-bottom:14px; color:var(--text-muted); font-size:13.5px;">
+          The table below is used automatically by the system to determine the <strong>Sample Size Code Letter</strong>, <strong>Sample Size (n)</strong>, <strong>Accept Limit (Ac)</strong>, and <strong>Reject Limit (Re)</strong> at <strong>AQL 1.0</strong> based on the received Lot Quantity:
+        </p>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lot Size Range (Lot Qty)</th>
+                <th>Code Letter (Level II)</th>
+                <th class="num-col">Raw Sample Size</th>
+                <th class="num-col">Effective AQL 1.0 Sample Size (n)</th>
+                <th class="num-col">Accept (Ac)</th>
+                <th class="num-col">Reject (Re)</th>
+                <th>AQL 1.0 Sampling Rule Explanation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>2 – 8</strong></td>
+                <td>Code A</td>
+                <td class="num-col">2</td>
+                <td class="num-col"><strong>100% of Lot (Max 8)</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Arrow down to Code E (n=13); since lot ≤ 8, inspect 100% of lot (Ac=0, Re=1)</td>
+              </tr>
+              <tr>
+                <td><strong>9 – 15</strong></td>
+                <td>Code B</td>
+                <td class="num-col">3</td>
+                <td class="num-col"><strong>13 (or 100% if &lt;13)</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Arrow down to Code E (n=13, Ac=0, Re=1)</td>
+              </tr>
+              <tr>
+                <td><strong>16 – 25</strong></td>
+                <td>Code C</td>
+                <td class="num-col">5</td>
+                <td class="num-col"><strong>13</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Arrow down to Code E (n=13, Ac=0, Re=1)</td>
+              </tr>
+              <tr>
+                <td><strong>26 – 50</strong></td>
+                <td>Code D</td>
+                <td class="num-col">8</td>
+                <td class="num-col"><strong>13</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Arrow down to Code E (n=13, Ac=0, Re=1)</td>
+              </tr>
+              <tr>
+                <td><strong>51 – 90</strong></td>
+                <td>Code E</td>
+                <td class="num-col">13</td>
+                <td class="num-col"><strong>13</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Standard Code E single sampling plan (0 defects allowed)</td>
+              </tr>
+              <tr>
+                <td><strong>91 – 150</strong></td>
+                <td>Code F</td>
+                <td class="num-col">20</td>
+                <td class="num-col"><strong>20</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">0</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">1</td>
+                <td>Sample size 20 units (Accept on 0 defects, Reject on ≥ 1)</td>
+              </tr>
+              <tr>
+                <td><strong>151 – 280</strong></td>
+                <td>Code G</td>
+                <td class="num-col">32</td>
+                <td class="num-col"><strong>32</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">1</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">2</td>
+                <td>Pass if defects ≤ 1; Reject if defects ≥ 2</td>
+              </tr>
+              <tr>
+                <td><strong>281 – 500</strong></td>
+                <td>Code H</td>
+                <td class="num-col">50</td>
+                <td class="num-col"><strong>50</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">1</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">2</td>
+                <td>Pass if defects ≤ 1; Reject if defects ≥ 2</td>
+              </tr>
+              <tr>
+                <td><strong>501 – 1,200</strong></td>
+                <td>Code J</td>
+                <td class="num-col">80</td>
+                <td class="num-col"><strong>80</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">2</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">3</td>
+                <td>Pass if defects ≤ 2; Reject if defects ≥ 3</td>
+              </tr>
+              <tr>
+                <td><strong>1,201 – 3,200</strong></td>
+                <td>Code K</td>
+                <td class="num-col">125</td>
+                <td class="num-col"><strong>125</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">3</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">4</td>
+                <td>Pass if defects ≤ 3; Reject if defects ≥ 4</td>
+              </tr>
+              <tr>
+                <td><strong>3,201 – 10,000</strong></td>
+                <td>Code L</td>
+                <td class="num-col">200</td>
+                <td class="num-col"><strong>200</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">5</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">6</td>
+                <td>Pass if defects ≤ 5; Reject if defects ≥ 6</td>
+              </tr>
+              <tr>
+                <td><strong>10,001 – 35,000</strong></td>
+                <td>Code M</td>
+                <td class="num-col">315</td>
+                <td class="num-col"><strong>315</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">7</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">8</td>
+                <td>Pass if defects ≤ 7; Reject if defects ≥ 8</td>
+              </tr>
+              <tr>
+                <td><strong>35,001 – 150,000</strong></td>
+                <td>Code N</td>
+                <td class="num-col">500</td>
+                <td class="num-col"><strong>500</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">10</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">11</td>
+                <td>Pass if defects ≤ 10; Reject if defects ≥ 11</td>
+              </tr>
+              <tr>
+                <td><strong>150,001 – 500,000</strong></td>
+                <td>Code P</td>
+                <td class="num-col">800</td>
+                <td class="num-col"><strong>800</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">14</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">15</td>
+                <td>Pass if defects ≤ 14; Reject if defects ≥ 15</td>
+              </tr>
+              <tr>
+                <td><strong>&gt; 500,000</strong></td>
+                <td>Code Q</td>
+                <td class="num-col">1,250</td>
+                <td class="num-col"><strong>1,250</strong></td>
+                <td class="num-col" style="color:var(--pass-text);font-weight:700;">21</td>
+                <td class="num-col" style="color:var(--reject-text);font-weight:700;">22</td>
+                <td>Pass if defects ≤ 21; Reject if defects ≥ 22</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- QUICK 100% SORTING / POST-INSPECTION EDIT MODAL -->
+  <div class="modal-backdrop" id="quickSortModal">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <div style="font-weight:700; font-size:15px; color:var(--primary);">
+          ⚡ Update 100% Sorting / Post-Inspection Check
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeQuickSortModal()">✖ Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="lot-summary-banner" id="quickSortLotBanner"></div>
+
+        <form id="quickSortForm" onsubmit="saveQuickSort(event)">
+          <input type="hidden" id="qsRecordId" value="" />
+          <input type="hidden" id="qsLotQty" value="0" />
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>100% Sorting Status <span class="req">*</span></label>
+              <select id="qsSortingStatus" required>
+                <option value="Completed (Post-Pass / Line Issue)">Completed (Post-Pass / Line Issue)</option>
+                <option value="Completed (During IQC)">Completed (During IQC)</option>
+                <option value="In Progress">In Progress (Ongoing 100% Check)</option>
+                <option value="Pending Vendor">Pending Vendor Sorting</option>
+                <option value="Not Required">Not Required (Clear Sorting)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Trigger / Reason for 100% Check <span class="req">*</span></label>
+              <input type="text" id="qsSortingReason" list="sortingReasonList" required placeholder="e.g. Line issue found after Pass" />
+            </div>
+            <div class="form-group">
+              <label>Sorting Date (When) <span class="req">*</span></label>
+              <input type="date" id="qsSortingDate" required />
+            </div>
+            <div class="form-group">
+              <label>Sorted By (PIC / Team)</label>
+              <select id="qsSortedBy">
+                <option value="IQC Inspector Team">IQC Inspector Team</option>
+                <option value="Vendor Rework Team">Vendor Rework Team</option>
+                <option value="Joint IQC & Vendor">Joint IQC & Vendor</option>
+                <option value="Production Support">Production Support</option>
+                <option value="N/A">N/A</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Start Time</label>
+              <input type="time" id="qsStartTime" oninput="calculateQuickSortDuration()" />
+            </div>
+            <div class="form-group">
+              <label>End Time</label>
+              <input type="time" id="qsEndTime" oninput="calculateQuickSortDuration()" />
+            </div>
+            <div class="form-group span-2">
+              <label>Time Taken (Duration) <span class="req">*</span></label>
+              <input type="text" id="qsTimeTaken" required placeholder="Auto-calculated from Start & End Time, or type e.g. 2 hrs 15 mins" />
+            </div>
+            <div class="form-group">
+              <label>Sorted Good Qty (OK)</label>
+              <input type="number" id="qsOkQty" min="0" placeholder="e.g. 1985" oninput="syncQuickSortNg()" />
+            </div>
+            <div class="form-group">
+              <label>Sorted Reject Qty (NG)</label>
+              <input type="number" id="qsNgQty" min="0" placeholder="e.g. 15" />
+            </div>
+            <div class="form-group">
+              <label>Updated Lot Judgment</label>
+              <select id="qsJudgmentStatus">
+                <option value="PASS">PASS (Accepted / Released)</option>
+                <option value="HOLD">HOLD (On-Hold / Sorting)</option>
+                <option value="REJECT">REJECT (Rejected / RTV)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Updated Disposition Action</label>
+              <select id="qsDispositionAction">
+                <option value="Release After 100% Sorting (Post-Inspection Check)">Release After 100% Sorting (Post-Inspection Check)</option>
+                <option value="Release to Warehouse / Production Stock">Release to Warehouse / Production Stock</option>
+                <option value="100% Sorting by Vendor / IQC">100% Sorting by Vendor / IQC</option>
+                <option value="Issue NCR / Return to Vendor (RTV)">Issue NCR / Return to Vendor (RTV)</option>
+                <option value="Conditional Accept (Concession / Waiver)">Conditional Accept (Concession / Waiver)</option>
+              </select>
+            </div>
+            <div class="form-group span-2">
+              <label>100% Sorting Remarks / Findings</label>
+              <input type="text" id="qsSortingRemarks" placeholder="e.g. Lot initially passed AQL 1.0; 100% check done due to assembly feedback. 15 NG removed." />
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid var(--border-light); flex-wrap:wrap; gap:10px;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="switchToFullEditFromModal()">✏️ Open Full Record Editor Instead</button>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-outline" onclick="closeQuickSortModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary">💾 Save 100% Sorting Update</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOUD SYNC (PHONE <-> LAPTOP) SETUP MODAL -->
+  <div class="modal-backdrop" id="cloudSyncModal">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <div style="font-weight:700; font-size:15px; color:var(--primary);">
+          ☁️ Link Phone & Laptop — Cloud Database Sync Setup
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeCloudSyncModal()">✖ Close</button>
+      </div>
+      <div class="modal-body" style="font-size:13.5px; line-height:1.55;">
+        <div class="lot-summary-banner">
+          <div>
+            <div style="font-weight:800; color:var(--primary); font-size:14px;" id="cloudStatusBannerTitle">Status: Local Device Storage Only</div>
+            <div style="font-size:12px; color:var(--text-muted);" id="cloudStatusBannerSub">By default, records are saved inside each device's browser. Enable Cloud Sync below so records saved on your Phone immediately appear on your Laptop.</div>
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-bottom:14px;">
+          <div class="form-group span-2">
+            <label>Select Cloud Sync Method</label>
+            <select id="cloudProviderSelect" onchange="toggleCloudProviderFields()">
+              <option value="github">Method 1: GitHub Repo Sync (Uses your aimanman50-dotcom/IQC-System repo)</option>
+              <option value="firebase">Method 2: Firebase Realtime Database URL (Free Google Cloud DB)</option>
+              <option value="none">Disable Cloud Sync (Local Device Only)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- GITHUB SYNC FIELDS -->
+        <div id="githubSyncFields" style="border:1px solid var(--border-light); border-radius:8px; padding:14px; background:var(--surface-alt); margin-bottom:14px;">
+          <div style="font-weight:700; color:var(--primary); margin-bottom:6px;">🐙 GitHub Repository Cloud Database (Recommended)</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+            Saves all inspection records & photos into <code>iqc_database.json</code> inside your GitHub repository so both your iPhone and Laptop share the exact same live data.
+          </p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>GitHub Username / Owner <span class="req">*</span></label>
+              <input type="text" id="ghOwner" value="aimanman50-dotcom" placeholder="e.g. aimanman50-dotcom" />
+            </div>
+            <div class="form-group">
+              <label>Repository Name <span class="req">*</span></label>
+              <input type="text" id="ghRepo" value="IQC-System" placeholder="e.g. IQC-System" />
+            </div>
+            <div class="form-group span-2">
+              <label>GitHub Personal Access Token (PAT) <span class="req">*</span></label>
+              <input type="password" id="ghToken" placeholder="Paste your ghp_... or github_pat_... token here" />
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
+                <strong>How to get your token in 30 seconds:</strong> Go to <a href="https://github.com/settings/tokens/new?scopes=repo&description=IQC-System-Sync" target="_blank" style="color:var(--accent); font-weight:700;">github.com/settings/tokens/new</a> → Set Expiration to <em>No expiration</em> → Tick the <strong>repo</strong> checkbox → Click <strong>Generate token</strong> → Copy & paste it above on both your Phone and Laptop.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FIREBASE SYNC FIELDS -->
+        <div id="firebaseSyncFields" style="display:none; border:1px solid var(--border-light); border-radius:8px; padding:14px; background:var(--surface-alt); margin-bottom:14px;">
+          <div style="font-weight:700; color:var(--primary); margin-bottom:6px;">🔥 Firebase Realtime Database URL</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+            Paste your Firebase Realtime Database URL (e.g. <code>https://your-project-default-rtdb.firebasedatabase.app</code>) on both your Phone and Laptop.
+          </p>
+          <div class="form-group">
+            <label>Firebase Database URL <span class="req">*</span></label>
+            <input type="text" id="fbDbUrl" placeholder="https://your-iqc-db-default-rtdb.asia-southeast1.firebasedatabase.app" />
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px solid var(--border-light);">
+          <button type="button" class="btn btn-outline btn-sm" onclick="pushToCloud(true)">⬆️ Force Upload Current Device Data to Cloud</button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-outline" onclick="closeCloudSyncModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveCloudConfig()">💾 Save & Connect Cloud Sync</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTALL AS MOBILE / DESKTOP APP MODAL -->
+  <div class="modal-backdrop" id="appInstallModal">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <div style="font-weight:700; font-size:15px; color:var(--primary);">
+          📲 Install IQC 1.0 System as a Mobile or Desktop App
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeAppInstallModal()">✖ Close</button>
+      </div>
+      <div class="modal-body" style="font-size:13.5px; line-height:1.6;">
+        <div class="lot-summary-banner">
+          <div>
+            <div style="font-weight:800; color:var(--primary); font-size:14px;">✅ PWA (Progressive Web App) Ready</div>
+            <div style="font-size:12px; color:var(--text-muted);">This file is pre-configured with a built-in App Icon, Full-Screen Standalone Mode, and Offline Storage.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="nativePromptBtn" style="display:none;" onclick="triggerNativeInstall()">📲 Install Now</button>
+        </div>
+
+        <div style="display:grid; gap:12px;">
+          <div style="border:1px solid var(--border-light); border-radius:8px; padding:12px; background:var(--surface-alt);">
+            <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">📱 1. Install on Android / iPhone (Home Screen App)</div>
+            <ul style="padding-left:18px; color:var(--text);">
+              <li><strong>Android (Chrome):</strong> Tap the <strong>⋮ (3-dots menu)</strong> at the top-right and select <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+              <li><strong>iPhone / iPad (Safari):</strong> Tap the <strong>Share icon (⬆️)</strong> at the bottom and select <strong>Add to Home Screen</strong>. It will open full-screen like a native app.</li>
+            </ul>
+          </div>
+
+          <div style="border:1px solid var(--border-light); border-radius:8px; padding:12px; background:var(--surface-alt);">
+            <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">💻 2. Install as a Windows / Mac Desktop App</div>
+            <ul style="padding-left:18px; color:var(--text);">
+              <li>Host this single HTML file for free on <strong>GitHub Pages</strong>, <strong>Netlify Drop</strong> (<code>app.netlify.com/drop</code>), or a local network server.</li>
+              <li>In <strong>Chrome</strong> or <strong>Microsoft Edge</strong>, click the <strong>Install App icon (⊕)</strong> in the address bar to pin it to your Desktop & Taskbar as a standalone window.</li>
+            </ul>
+          </div>
+
+          <div style="border:1px solid var(--border-light); border-radius:8px; padding:12px; background:var(--surface-alt);">
+            <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">📦 3. Convert to Android APK File (.apk)</div>
+            <ul style="padding-left:18px; color:var(--text);">
+              <li>Upload this <code>iqc_incoming_inspection_system.html</code> file to <strong>WebIntoApp.com</strong> or wrap it with <strong>Capacitor / Apache Cordova</strong> to generate an installable <code>.apk</code> file for factory tablets and phones.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+          <button class="btn btn-primary" onclick="closeAppInstallModal()">Got It</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINTABLE IQC INSPECTION REPORT & NCR MODAL -->
+  <div class="modal-backdrop" id="reportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div style="font-weight:700; font-size:15px;">📄 Printable IQC Inspection Report Certificate</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print / Save as PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="closeReportModal()">✖ Close</button>
+        </div>
+      </div>
+      <div class="modal-body" id="reportModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "iqc_inspection_records_en_v3";
+    const CLOUD_CFG_KEY = "iqc_cloud_sync_config_v1";
+    let cloudConfig = { provider: "none", ghOwner: "aimanman50-dotcom", ghRepo: "IQC-System", ghToken: "", fbDbUrl: "" };
+
+    function loadCloudConfig() {
+      const saved = localStorage.getItem(CLOUD_CFG_KEY);
+      if (saved) {
+        try {
+          cloudConfig = { ...cloudConfig, ...JSON.parse(saved) };
+        } catch (e) {}
+      }
+      updateCloudIndicator();
+    }
+
+    function updateCloudIndicator() {
+      const btn = document.getElementById("cloudSyncHeaderBtn");
+      const title = document.getElementById("cloudStatusBannerTitle");
+      const sub = document.getElementById("cloudStatusBannerSub");
+      if (!btn) return;
+
+      if (cloudConfig.provider === "github" && cloudConfig.ghToken) {
+        btn.innerHTML = "☁️ Cloud Sync: Connected (GitHub)";
+        btn.style.background = "#dcfce7";
+        btn.style.color = "#166534";
+        btn.style.borderColor = "#86efac";
+        if (title) title.textContent = `✅ Connected to GitHub (${cloudConfig.ghOwner}/${cloudConfig.ghRepo})`;
+        if (sub) sub.textContent = "All records saved on this device automatically sync with your GitHub repository.";
+      } else if (cloudConfig.provider === "firebase" && cloudConfig.fbDbUrl) {
+        btn.innerHTML = "☁️ Cloud Sync: Connected (Firebase)";
+        btn.style.background = "#dcfce7";
+        btn.style.color = "#166534";
+        btn.style.borderColor = "#86efac";
+        if (title) title.textContent = "✅ Connected to Firebase Realtime Database";
+        if (sub) sub.textContent = "All records saved on this device automatically sync with your Firebase Cloud DB.";
+      } else {
+        btn.innerHTML = "☁️ Link Phone & Laptop (Cloud Sync)";
+        btn.style.background = "#fef3c7";
+        btn.style.color = "#92400e";
+        btn.style.borderColor = "#f59e0b";
+        if (title) title.textContent = "Status: Local Device Storage Only (Not Linked Yet)";
+        if (sub) sub.textContent = "Enter your GitHub Token or Firebase URL below on both your Phone and Laptop to sync records automatically.";
+      }
+    }
+
+    function openCloudSyncModal() {
+      document.getElementById("cloudProviderSelect").value = cloudConfig.provider === "none" ? "github" : cloudConfig.provider;
+      document.getElementById("ghOwner").value = cloudConfig.ghOwner || "aimanman50-dotcom";
+      document.getElementById("ghRepo").value = cloudConfig.ghRepo || "IQC-System";
+      document.getElementById("ghToken").value = cloudConfig.ghToken || "";
+      document.getElementById("fbDbUrl").value = cloudConfig.fbDbUrl || "";
+      toggleCloudProviderFields();
+      updateCloudIndicator();
+      document.getElementById("cloudSyncModal").classList.add("open");
+    }
+
+    function closeCloudSyncModal() {
+      document.getElementById("cloudSyncModal").classList.remove("open");
+    }
+
+    function toggleCloudProviderFields() {
+      const p = document.getElementById("cloudProviderSelect").value;
+      document.getElementById("githubSyncFields").style.display = p === "github" ? "block" : "none";
+      document.getElementById("firebaseSyncFields").style.display = p === "firebase" ? "block" : "none";
+    }
+
+    async function saveCloudConfig() {
+      const p = document.getElementById("cloudProviderSelect").value;
+      cloudConfig = {
+        provider: p,
+        ghOwner: document.getElementById("ghOwner").value.trim() || "aimanman50-dotcom",
+        ghRepo: document.getElementById("ghRepo").value.trim() || "IQC-System",
+        ghToken: document.getElementById("ghToken").value.trim(),
+        fbDbUrl: document.getElementById("fbDbUrl").value.trim().replace(/\/+$/, "")
+      };
+      localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudConfig));
+      updateCloudIndicator();
+      closeCloudSyncModal();
+
+      if (p !== "none") {
+        const pulled = await syncFromCloud(false);
+        if (!pulled) {
+          await pushToCloud(true);
+        }
+      }
+    }
+
+    // Encode UTF-8 string safely to Base64 for GitHub API
+    function utf8ToBase64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function base64ToUtf8(b64) {
+      return decodeURIComponent(escape(atob(b64.replace(/\s/g, ""))));
+    }
+
+    async function pushToCloud(showAlert = false) {
+      if (cloudConfig.provider === "github" && cloudConfig.ghToken) {
+        try {
+          const apiUrl = `https://api.github.com/repos/${cloudConfig.ghOwner}/${cloudConfig.ghRepo}/contents/iqc_database.json`;
+          let sha = null;
+          const getRes = await fetch(apiUrl, {
+            headers: {
+              "Authorization": `Bearer ${cloudConfig.ghToken}`,
+              "Accept": "application/vnd.github+json"
+            }
+          });
+          if (getRes.ok) {
+            const existing = await getRes.json();
+            sha = existing.sha;
+          }
+          const payload = {
+            message: `Sync IQC records (${new Date().toISOString()})`,
+            content: utf8ToBase64(JSON.stringify(records, null, 2))
+          };
+          if (sha) payload.sha = sha;
+
+          const putRes = await fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${cloudConfig.ghToken}`,
+              "Accept": "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+          if (!putRes.ok) {
+            const err = await putRes.json();
+            if (showAlert) alert("GitHub Cloud Sync Error: " + (err.message || putRes.statusText));
+            return false;
+          }
+          if (showAlert) alert("✅ Successfully synced records to GitHub Cloud Database!");
+          return true;
+        } catch (err) {
+          if (showAlert) alert("GitHub Sync Network Error: " + err.message);
+          return false;
+        }
+      } else if (cloudConfig.provider === "firebase" && cloudConfig.fbDbUrl) {
+        try {
+          const url = `${cloudConfig.fbDbUrl}/iqc_records.json`;
+          const res = await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(records)
+          });
+          if (!res.ok) throw new Error(res.statusText);
+          if (showAlert) alert("✅ Successfully synced records to Firebase Cloud Database!");
+          return true;
+        } catch (err) {
+          if (showAlert) alert("Firebase Sync Error: " + err.message);
+          return false;
+        }
+      } else if (showAlert) {
+        openCloudSyncModal();
+      }
+      return false;
+    }
+
+    async function syncFromCloud(showAlert = false) {
+      if (cloudConfig.provider === "github" && cloudConfig.ghToken) {
+        try {
+          const apiUrl = `https://api.github.com/repos/${cloudConfig.ghOwner}/${cloudConfig.ghRepo}/contents/iqc_database.json`;
+          const res = await fetch(apiUrl, {
+            headers: {
+              "Authorization": `Bearer ${cloudConfig.ghToken}`,
+              "Accept": "application/vnd.github+json"
+            },
+            cache: "no-store"
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const parsed = JSON.parse(base64ToUtf8(data.content));
+            if (Array.isArray(parsed)) {
+              records = parsed;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+              refreshAllViews();
+              if (showAlert) alert(`✅ Synced ${records.length} records from GitHub Cloud!`);
+              return true;
+            }
+          } else if (res.status === 404) {
+            if (showAlert) alert("No cloud database file found yet. Uploading your current records now...");
+            await pushToCloud(showAlert);
+            return true;
+          } else {
+            if (showAlert) alert("Failed to pull from GitHub Cloud. Please check your Token.");
+          }
+        } catch (err) {
+          if (showAlert) alert("GitHub Sync Error: " + err.message);
+        }
+      } else if (cloudConfig.provider === "firebase" && cloudConfig.fbDbUrl) {
+        try {
+          const url = `${cloudConfig.fbDbUrl}/iqc_records.json`;
+          const res = await fetch(url, { cache: "no-store" });
+          if (res.ok) {
+            const parsed = await res.json();
+            if (Array.isArray(parsed)) {
+              records = parsed;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+              refreshAllViews();
+              if (showAlert) alert(`✅ Synced ${records.length} records from Firebase Cloud!`);
+              return true;
+            }
+          }
+        } catch (err) {
+          if (showAlert) alert("Firebase Pull Error: " + err.message);
+        }
+      } else if (showAlert) {
+        openCloudSyncModal();
+      }
+      return false;
+    }
+
+    function importJSONFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            records = imported;
+            saveDataToStorage();
+            refreshAllViews();
+            alert(`✅ Imported ${records.length} inspection records successfully!`);
+          } else {
+            alert("Invalid JSON backup format.");
+          }
+        } catch (err) {
+          alert("Error reading JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    let records = [];
+    let currentFormPhotos = [];
+
+    // Helper: Generate clear SVG data URLs for realistic sample incoming material photos
+    function createMaterialSvgDataUrl(title, subtitle, partCode, badgeText, badgeColor, bgAccent) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+        <rect width="480" height="320" fill="${bgAccent}"/>
+        <rect x="16" y="16" width="448" height="288" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="32" y="32" width="125" height="28" rx="5" fill="${badgeColor}"/>
+        <text x="94" y="51" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">${badgeText}</text>
+        <text x="440" y="50" font-family="monospace" font-size="13" font-weight="bold" fill="#475569" text-anchor="end">${partCode}</text>
+        <!-- Technical Drawing Illustration -->
+        <g transform="translate(140, 75)" stroke="#0f4c81" stroke-width="2.5" fill="#e0f2fe">
+          <rect x="20" y="20" width="160" height="100" rx="8"/>
+          <circle cx="50" cy="50" r="10" fill="#ffffff"/>
+          <circle cx="150" cy="50" r="10" fill="#ffffff"/>
+          <circle cx="50" cy="90" r="10" fill="#ffffff"/>
+          <circle cx="150" cy="90" r="10" fill="#ffffff"/>
+          <rect x="75" y="45" width="50" height="50" rx="4" fill="#bae6fd"/>
+          <line x1="0" y1="70" x2="200" y2="70" stroke="#0284c7" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="100" y1="5" x2="100" y2="135" stroke="#0284c7" stroke-width="1" stroke-dasharray="4,4"/>
+        </g>
+        <text x="240" y="245" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="middle">${title}</text>
+        <text x="240" y="270" font-family="Arial, sans-serif" font-size="13" fill="#475569" text-anchor="middle">${subtitle}</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    // AQL 1.0 Calculation Engine (ISO 2859-1 General Inspection Level II - Normal)
+    function getAql10Plan(lotQty) {
+      const N = parseInt(lotQty, 10) || 0;
+      if (N <= 0) return { code: "-", sampleSize: 0, ac: 0, re: 1, note: "Please enter Lot Qty." };
+      if (N <= 8) {
+        return { code: "A (→E)", sampleSize: N, ac: 0, re: 1, note: "Lot ≤ 8: Arrow down to Code E (Inspect 100% of lot, Ac=0, Re=1)" };
+      }
+      if (N <= 15) {
+        const s = Math.min(N, 13);
+        return { code: "B (→E)", sampleSize: s, ac: 0, re: 1, note: "Lot 9–15: Arrow down to Code E (Sample 13 or 100% of lot, Ac=0, Re=1)" };
+      }
+      if (N <= 25) return { code: "C (→E)", sampleSize: 13, ac: 0, re: 1, note: "Lot 16–25: Arrow down to Code E (Sample 13, Ac=0, Re=1)" };
+      if (N <= 50) return { code: "D (→E)", sampleSize: 13, ac: 0, re: 1, note: "Lot 26–50: Arrow down to Code E (Sample 13, Ac=0, Re=1)" };
+      if (N <= 90) return { code: "E", sampleSize: 13, ac: 0, re: 1, note: "Lot 51–90 (Code E): Sample = 13, Accept (Ac) = 0, Reject (Re) = 1" };
+      if (N <= 150) return { code: "F", sampleSize: 20, ac: 0, re: 1, note: "Lot 91–150 (Code F): Sample = 20, Accept (Ac) = 0, Reject (Re) = 1" };
+      if (N <= 280) return { code: "G", sampleSize: 32, ac: 1, re: 2, note: "Lot 151–280 (Code G): Sample = 32, Accept (Ac) = 1, Reject (Re) = 2" };
+      if (N <= 500) return { code: "H", sampleSize: 50, ac: 1, re: 2, note: "Lot 281–500 (Code H): Sample = 50, Accept (Ac) = 1, Reject (Re) = 2" };
+      if (N <= 1200) return { code: "J", sampleSize: 80, ac: 2, re: 3, note: "Lot 501–1,200 (Code J): Sample = 80, Accept (Ac) = 2, Reject (Re) = 3" };
+      if (N <= 3200) return { code: "K", sampleSize: 125, ac: 3, re: 4, note: "Lot 1,201–3,200 (Code K): Sample = 125, Accept (Ac) = 3, Reject (Re) = 4" };
+      if (N <= 10000) return { code: "L", sampleSize: 200, ac: 5, re: 6, note: "Lot 3,201–10,000 (Code L): Sample = 200, Accept (Ac) = 5, Reject (Re) = 6" };
+      if (N <= 35000) return { code: "M", sampleSize: 315, ac: 7, re: 8, note: "Lot 10,001–35,000 (Code M): Sample = 315, Accept (Ac) = 7, Reject (Re) = 8" };
+      if (N <= 150000) return { code: "N", sampleSize: 500, ac: 10, re: 11, note: "Lot 35,001–150,000 (Code N): Sample = 500, Accept (Ac) = 10, Reject (Re) = 11" };
+      if (N <= 500000) return { code: "P", sampleSize: 800, ac: 14, re: 15, note: "Lot 150,001–500,000 (Code P): Sample = 800, Accept (Ac) = 14, Reject (Re) = 15" };
+      return { code: "Q", sampleSize: 1250, ac: 21, re: 22, note: "Lot > 500,000 (Code Q): Sample = 1,250, Accept (Ac) = 21, Reject (Re) = 22" };
+    }
+
+    function formatDurationFromTimes(start, end) {
+      if (!start || !end) return "";
+      const [sh, sm] = start.split(":").map(Number);
+      const [eh, em] = end.split(":").map(Number);
+      let diffMins = (eh * 60 + em) - (sh * 60 + sm);
+      if (diffMins < 0) diffMins += 24 * 60;
+      const hrs = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      if (hrs > 0 && mins > 0) return `${hrs} hr ${mins} mins (${diffMins} mins)`;
+      if (hrs > 0) return `${hrs} hr (${diffMins} mins)`;
+      return `${mins} mins`;
+    }
+
+    function calculateSortingDuration() {
+      const start = document.getElementById("sortingStartTime").value;
+      const end = document.getElementById("sortingEndTime").value;
+      const res = formatDurationFromTimes(start, end);
+      if (res) document.getElementById("sortingTimeTaken").value = res;
+    }
+
+    function calculateQuickSortDuration() {
+      const start = document.getElementById("qsStartTime").value;
+      const end = document.getElementById("qsEndTime").value;
+      const res = formatDurationFromTimes(start, end);
+      if (res) document.getElementById("qsTimeTaken").value = res;
+    }
+
+    function syncSortingNgFromOk() {
+      const lotQty = parseInt(document.getElementById("lotQty").value, 10) || 0;
+      const okQty = parseInt(document.getElementById("sortingOkQty").value, 10);
+      if (lotQty > 0 && !isNaN(okQty) && okQty <= lotQty) {
+        document.getElementById("sortingNgQty").value = lotQty - okQty;
+      }
+    }
+
+    function syncQuickSortNg() {
+      const lotQty = parseInt(document.getElementById("qsLotQty").value, 10) || 0;
+      const okQty = parseInt(document.getElementById("qsOkQty").value, 10);
+      if (lotQty > 0 && !isNaN(okQty) && okQty <= lotQty) {
+        document.getElementById("qsNgQty").value = lotQty - okQty;
+      }
+    }
+
+    function handleSortingStatusChange() {
+      const st = document.getElementById("sortingStatus").value;
+      if (st !== "Not Required" && !document.getElementById("sortingDate").value) {
+        document.getElementById("sortingDate").value = document.getElementById("inspectionDate").value || new Date().toISOString().slice(0, 10);
+      }
+      if (st === "Not Required") {
+        document.getElementById("sortingReason").value = "";
+        document.getElementById("sortingDate").value = "";
+        document.getElementById("sortingStartTime").value = "";
+        document.getElementById("sortingEndTime").value = "";
+        document.getElementById("sortingTimeTaken").value = "";
+        document.getElementById("sortedBy").value = "N/A";
+        document.getElementById("sortingOkQty").value = "";
+        document.getElementById("sortingNgQty").value = "";
+        document.getElementById("sortingRemarks").value = "";
+      }
+    }
+
+    // Open Quick 100% Sorting Modal for ANY existing record (including already PASSED lots)
+    function openQuickSortModal(id) {
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+
+      document.getElementById("qsRecordId").value = rec.id;
+      document.getElementById("qsLotQty").value = rec.lotQty || 0;
+
+      document.getElementById("quickSortLotBanner").innerHTML = `
+        <div>
+          <div style="font-weight:800; color:var(--primary); font-size:14px;">${escapeHtml(rec.iqcNo)} — ${escapeHtml(rec.partNo)} (${escapeHtml(rec.partName)})</div>
+          <div style="font-size:12px; color:var(--text-muted);">Vendor: <strong>${escapeHtml(rec.vendorName)}</strong> | Lot Qty: <strong>${(rec.lotQty || 0).toLocaleString()} ${escapeHtml(rec.uom || "PCS")}</strong> | Inspected: ${escapeHtml(rec.inspectionDate)}</div>
+        </div>
+        <div>
+          <span class="status-badge status-${rec.judgmentStatus}">Current: ${rec.judgmentStatus}</span>
+        </div>
+      `;
+
+      const isAlreadySorted = rec.sortingStatus && rec.sortingStatus !== "Not Required";
+      document.getElementById("qsSortingStatus").value = isAlreadySorted ? rec.sortingStatus : "Completed (Post-Pass / Line Issue)";
+      document.getElementById("qsSortingReason").value = rec.sortingReason || (rec.judgmentStatus === "PASS" ? "Production Line Issue Found After Initial Pass" : "AQL Sample Exceeded Limit — 100% Screening");
+      document.getElementById("qsSortingDate").value = rec.sortingDate || new Date().toISOString().slice(0, 10);
+      document.getElementById("qsSortedBy").value = (rec.sortedBy && rec.sortedBy !== "N/A") ? rec.sortedBy : "IQC Inspector Team";
+      document.getElementById("qsStartTime").value = rec.sortingStartTime || "09:00";
+      document.getElementById("qsEndTime").value = rec.sortingEndTime || "11:00";
+      document.getElementById("qsTimeTaken").value = rec.sortingTimeTaken || formatDurationFromTimes(document.getElementById("qsStartTime").value, document.getElementById("qsEndTime").value);
+      document.getElementById("qsOkQty").value = rec.sortingOkQty ? rec.sortingOkQty : (rec.lotQty || "");
+      document.getElementById("qsNgQty").value = rec.sortingNgQty ? rec.sortingNgQty : 0;
+      document.getElementById("qsJudgmentStatus").value = rec.judgmentStatus;
+      document.getElementById("qsDispositionAction").value = rec.dispositionAction || "Release After 100% Sorting (Post-Inspection Check)";
+      document.getElementById("qsSortingRemarks").value = rec.sortingRemarks || "";
+
+      document.getElementById("quickSortModal").classList.add("open");
+    }
+
+    function closeQuickSortModal() {
+      document.getElementById("quickSortModal").classList.remove("open");
+    }
+
+    function switchToFullEditFromModal() {
+      const id = document.getElementById("qsRecordId").value;
+      closeQuickSortModal();
+      if (id) editRecord(id);
+    }
+
+    function saveQuickSort(event) {
+      event.preventDefault();
+      const id = document.getElementById("qsRecordId").value;
+      const idx = records.findIndex(r => r.id === id);
+      if (idx === -1) return;
+
+      const st = document.getElementById("qsSortingStatus").value;
+      records[idx].sortingStatus = st;
+      if (st === "Not Required") {
+        records[idx].sortingReason = "";
+        records[idx].sortingDate = "";
+        records[idx].sortingStartTime = "";
+        records[idx].sortingEndTime = "";
+        records[idx].sortingTimeTaken = "";
+        records[idx].sortedBy = "N/A";
+        records[idx].sortingOkQty = 0;
+        records[idx].sortingNgQty = 0;
+        records[idx].sortingRemarks = "";
+      } else {
+        records[idx].sortingReason = document.getElementById("qsSortingReason").value.trim();
+        records[idx].sortingDate = document.getElementById("qsSortingDate").value;
+        records[idx].sortingStartTime = document.getElementById("qsStartTime").value;
+        records[idx].sortingEndTime = document.getElementById("qsEndTime").value;
+        records[idx].sortingTimeTaken = document.getElementById("qsTimeTaken").value.trim();
+        records[idx].sortedBy = document.getElementById("qsSortedBy").value;
+        records[idx].sortingOkQty = parseInt(document.getElementById("qsOkQty").value, 10) || 0;
+        records[idx].sortingNgQty = parseInt(document.getElementById("qsNgQty").value, 10) || 0;
+        records[idx].sortingRemarks = document.getElementById("qsSortingRemarks").value.trim();
+      }
+
+      records[idx].judgmentStatus = document.getElementById("qsJudgmentStatus").value;
+      records[idx].dispositionAction = document.getElementById("qsDispositionAction").value;
+      records[idx].lastUpdated = new Date().toISOString().slice(0, 10);
+
+      saveDataToStorage();
+      refreshAllViews();
+      closeQuickSortModal();
+    }
+
+    function getInitialDemoRecords() {
+      return [
+        {
+          id: "rec-1",
+          iqcNo: "IQC-20261014-001",
+          inspectionDate: "2026-10-14",
+          vendorName: "TechPlast Industries Sdn Bhd",
+          commodity: "Plastic / Injection",
+          partNo: "INJ-CVR-402A",
+          partName: "Front Housing ABS Black",
+          poDoNo: "PO-88410 / DO-5512",
+          lotNo: "LOT-2610-P09",
+          lotQty: 2000,
+          uom: "PCS",
+          aqlMode: "iso_arrow",
+          sampleCode: "K",
+          sampleSize: 125,
+          aqlAc: 3,
+          aqlRe: 4,
+          coaStatus: "Complete (Attached)",
+          chkVisual: "PASS",
+          rmkVisual: "Uniform gloss finish, no sink marks or silver streaks",
+          chkDimension: "PASS",
+          rmkDimension: "Length 120.04mm (Spec: 120.0±0.15mm), Wall thickness 2.50mm",
+          chkFunction: "PASS",
+          rmkFunction: "Passed snap-fit assembly check with Rear Cover",
+          chkPackaging: "PASS",
+          rmkPackaging: "Cartons lined with polybag and cardboard partitions",
+          defects: [
+            { type: "Minor Flash on Inner Rib", category: "Minor", qty: 1, note: "Slight flash on internal rib edge (does not affect fit)" }
+          ],
+          totalDefectQty: 1,
+          judgmentStatus: "PASS",
+          dispositionAction: "Release After 100% Sorting (Post-Inspection Check)",
+          sortingStatus: "Completed (Post-Pass / Line Issue)",
+          sortingReason: "Production Line Issue Found After Initial Pass",
+          sortingDate: "2026-10-14",
+          sortingStartTime: "15:00",
+          sortingEndTime: "17:15",
+          sortingTimeTaken: "2 hr 15 mins (135 mins)",
+          sortedBy: "IQC Inspector Team",
+          sortingOkQty: 1992,
+          sortingNgQty: 8,
+          sortingRemarks: "Lot initially PASSED AQL 1.0 (1/125); later 100% check requested by Assembly Line. 8 pcs inner flash removed, 1,992 pcs OK.",
+          inspectorName: "Mohd Faiz",
+          verifiedBy: "Nurul Huda (QA Eng)",
+          ncrNo: "",
+          remarks: "Initial AQL 1.0 Pass; updated with post-pass 100% sorting record.",
+          photos: [
+            {
+              url: createMaterialSvgDataUrl("Front Housing ABS Black", "Incoming Lot: 2,000 PCS | Sample: 125 PCS", "INJ-CVR-402A", "INCOMING OK", "#166534", "#f0fdf4"),
+              caption: "Incoming Material & Supplier Lot Label",
+              tag: "Incoming Material"
+            },
+            {
+              url: createMaterialSvgDataUrl("Digital Caliper Dimension Check", "Reading: 120.04mm (Within Spec ±0.15mm)", "DIM-CHECK", "AQL 1.0 PASS", "#0f4c81", "#f0f9ff"),
+              caption: "Dimensional verification using calibrated Digital Caliper",
+              tag: "Dimensional Check"
+            }
+          ]
+        },
+        {
+          id: "rec-2",
+          iqcNo: "IQC-20261014-002",
+          inspectionDate: "2026-10-14",
+          vendorName: "Sinaran Metal Stamping Sdn Bhd",
+          commodity: "Metal / Stamping",
+          partNo: "MTL-BRK-118",
+          partName: "Chassis Support Bracket SUS304",
+          poDoNo: "PO-88395 / DO-9921",
+          lotNo: "LOT-SUS-882",
+          lotQty: 800,
+          uom: "PCS",
+          aqlMode: "iso_arrow",
+          sampleCode: "J",
+          sampleSize: 80,
+          aqlAc: 2,
+          aqlRe: 3,
+          coaStatus: "Complete (Attached)",
+          chkVisual: "FAIL",
+          rmkVisual: "Sharp burrs & deep scratches around mounting hole surface",
+          chkDimension: "FAIL",
+          rmkDimension: "M4 clearance hole undersized (3.72mm actual vs 4.20±0.10mm spec)",
+          chkFunction: "FAIL",
+          rmkFunction: "M4 screw jammed during mating assembly check",
+          chkPackaging: "PASS",
+          rmkPackaging: "Outer carton condition acceptable",
+          defects: [
+            { type: "Undersized Mounting Hole", category: "Major", qty: 4, note: "Hole diameter 3.72mm; M4 fastener cannot pass through" },
+            { type: "Heavy Burr / Sharp Edge", category: "Major", qty: 2, note: "Burr height > 0.3mm along die-cut edge" }
+          ],
+          totalDefectQty: 6,
+          judgmentStatus: "REJECT",
+          dispositionAction: "Issue NCR / Return to Vendor (RTV)",
+          sortingStatus: "Pending Vendor",
+          sortingReason: "AQL Sample Exceeded Limit — 100% Screening",
+          sortingDate: "2026-10-15",
+          sortingStartTime: "09:00",
+          sortingEndTime: "12:30",
+          sortingTimeTaken: "3 hr 30 mins (210 mins)",
+          sortedBy: "Vendor Rework Team",
+          sortingOkQty: 742,
+          sortingNgQty: 58,
+          sortingRemarks: "Vendor team scheduled to sort 800 pcs at IQC quarantine bay.",
+          inspectorName: "Siti Aisyah",
+          verifiedBy: "Nurul Huda (QA Eng)",
+          ncrNo: "NCR-2026-041",
+          remarks: "6 defective units exceed AQL 1.0 limit (Re = 3). Lot rejected; vendor scheduled for 100% sorting & RTV replacement.",
+          photos: [
+            {
+              url: createMaterialSvgDataUrl("Bracket SUS304 — Undersize Hole", "Defects: 6 / 80 Sample (Exceeds Re=3)", "MTL-BRK-118", "DEFECT / NG", "#991b1b", "#fef2f2"),
+              caption: "Defect Evidence: Undersized M4 hole & sharp edge burr on bracket",
+              tag: "Defect Evidence (NG)"
+            }
+          ]
+        },
+        {
+          id: "rec-3",
+          iqcNo: "IQC-20261013-018",
+          inspectionDate: "2026-10-13",
+          vendorName: "MicroChip Semi Components",
+          commodity: "Electronic / PCB",
+          partNo: "PCB-CTRL-V4",
+          partName: "Main Power Controller PCBA Rev 4.0",
+          poDoNo: "PO-88350 / DO-410",
+          lotNo: "PCBA-2641",
+          lotQty: 350,
+          uom: "PCS",
+          aqlMode: "iso_arrow",
+          sampleCode: "H",
+          sampleSize: 50,
+          aqlAc: 1,
+          aqlRe: 2,
+          coaStatus: "Complete (Attached)",
+          chkVisual: "PASS",
+          rmkVisual: "Soldering meets IPC-A-610 Class 2 workmanship standard",
+          chkDimension: "PASS",
+          rmkDimension: "PCB thickness 1.60mm within tolerance",
+          chkFunction: "PASS",
+          rmkFunction: "ICT & power-on self-test passed",
+          chkPackaging: "PASS",
+          rmkPackaging: "ESD shielding bags and moisture barrier intact",
+          defects: [],
+          totalDefectQty: 0,
+          judgmentStatus: "PASS",
+          dispositionAction: "Release to Warehouse / Production Stock",
+          sortingStatus: "Not Required",
+          sortingReason: "",
+          sortingDate: "",
+          sortingStartTime: "",
+          sortingEndTime: "",
+          sortingTimeTaken: "",
+          sortedBy: "N/A",
+          sortingOkQty: 0,
+          sortingNgQty: 0,
+          sortingRemarks: "",
+          inspectorName: "Mohd Faiz",
+          verifiedBy: "Irwan Shah (QA Mgr)",
+          ncrNo: "",
+          remarks: "0 defects found on 50 sample units. Click '⚡ 100% Sort / Edit' anytime if future sorting is required.",
+          photos: [
+            {
+              url: createMaterialSvgDataUrl("Main Power Controller PCBA", "ESD Tray & Moisture Barrier Bag Check", "PCB-CTRL-V4", "AQL 1.0 PASS", "#166534", "#f0fdf4"),
+              caption: "Incoming ESD packaging condition upon arrival at IQC bay",
+              tag: "Packaging / Label"
+            }
+          ]
+        }
+      ];
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          records = JSON.parse(saved);
+        } catch (e) {
+          records = getInitialDemoRecords();
+        }
+      } else {
+        records = getInitialDemoRecords();
+        saveDataToStorage();
+      }
+      refreshAllViews();
+    }
+
+    function saveDataToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        pushToCloud(false);
+      } catch (e) {
+        alert("Browser storage is full. Please remove large photos or export a JSON backup.");
+      }
+    }
+
+    function resetDemoData() {
+      if (confirm("Reset to default sample records? Current records will be replaced with sample data.")) {
+        records = getInitialDemoRecords();
+        saveDataToStorage();
+        refreshAllViews();
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-panel").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      const btn = document.getElementById("btn-" + tabId);
+      if (btn) btn.classList.add("active");
+    }
+
+    function openNewForm() {
+      resetForm();
+      switchTab("tab-form");
+    }
+
+    function generateNextIqcNo() {
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const seq = String(records.length + 1).padStart(3, "0");
+      return `IQC-${today}-${seq}`;
+    }
+
+    function resetForm() {
+      document.getElementById("iqcForm").reset();
+      document.getElementById("editRecordId").value = "";
+      document.getElementById("formHeaderTitle").textContent = "➕ Incoming Quality Control (IQC) Inspection Form";
+      document.getElementById("iqcNo").value = generateNextIqcNo();
+      document.getElementById("inspectionDate").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("defectRowsContainer").innerHTML = "";
+      currentFormPhotos = [];
+      renderFormPhotoGallery();
+      recalculateAQL();
+      recalculateTotalDefects();
+    }
+
+    function recalculateAQL() {
+      const mode = document.getElementById("aqlMode").value;
+      const lotQty = parseInt(document.getElementById("lotQty").value, 10) || 0;
+      const sampleInput = document.getElementById("sampleSize");
+      const acInput = document.getElementById("aqlAc");
+      const reInput = document.getElementById("aqlRe");
+      const codeInput = document.getElementById("sampleCode");
+
+      if (mode === "iso_arrow") {
+        const plan = getAql10Plan(lotQty);
+        codeInput.value = plan.code;
+        sampleInput.value = plan.sampleSize || "";
+        acInput.value = plan.ac;
+        reInput.value = plan.re;
+        sampleInput.readOnly = true;
+        acInput.readOnly = true;
+        reInput.readOnly = true;
+
+        document.getElementById("bannerCode").textContent = plan.code;
+        document.getElementById("bannerSample").textContent = plan.sampleSize;
+        document.getElementById("bannerAc").textContent = plan.ac;
+        document.getElementById("bannerRe").textContent = plan.re;
+        document.getElementById("aqlRuleHint").textContent = plan.note;
+      } else if (mode === "100_pct") {
+        codeInput.value = "100%";
+        sampleInput.value = lotQty || "";
+        acInput.value = 0;
+        reInput.value = 1;
+        sampleInput.readOnly = true;
+        acInput.readOnly = false;
+        reInput.readOnly = false;
+
+        document.getElementById("bannerCode").textContent = "100%";
+        document.getElementById("bannerSample").textContent = lotQty || 0;
+        document.getElementById("bannerAc").textContent = 0;
+        document.getElementById("bannerRe").textContent = 1;
+        document.getElementById("aqlRuleHint").textContent = "100% Inspection of all units in the received lot.";
+        document.getElementById("sortingStatus").value = "Completed (During IQC)";
+        handleSortingStatusChange();
+      } else {
+        codeInput.value = "CUSTOM";
+        sampleInput.readOnly = false;
+        acInput.readOnly = false;
+        reInput.readOnly = false;
+        document.getElementById("bannerCode").textContent = "CUSTOM";
+        document.getElementById("aqlRuleHint").textContent = "Custom Mode: Enter Sample Size, Ac, and Re manually.";
+      }
+
+      evaluateJudgment();
+    }
+
+    function addDefectRow(data = { type: "", category: "Major", qty: 1, note: "" }) {
+      const container = document.getElementById("defectRowsContainer");
+      const row = document.createElement("div");
+      row.className = "defect-row";
+      row.innerHTML = `
+        <div>
+          <input type="text" class="def-type" list="commonDefects" placeholder="Defect Type (e.g. Scratch, Burr, Out of Spec)" value="${escapeHtml(data.type)}" required />
+          <datalist id="commonDefects">
+            <option value="Surface Scratch"></option>
+            <option value="Dent / Deformation"></option>
+            <option value="Burr / Sharp Edge"></option>
+            <option value="Molding Flash"></option>
+            <option value="Dimension Out of Spec"></option>
+            <option value="Rust / Oxidation"></option>
+            <option value="Color Variation / Discoloration"></option>
+            <option value="Oil / Surface Contamination"></option>
+            <option value="Wrong Label / Mixed Part"></option>
+            <option value="Short Molding / Incomplete Fill"></option>
+          </datalist>
+        </div>
+        <div>
+          <select class="def-cat" onchange="recalculateTotalDefects()">
+            <option value="Critical" ${data.category === "Critical" ? "selected" : ""}>Critical</option>
+            <option value="Major" ${data.category === "Major" ? "selected" : ""}>Major (AQL 1.0)</option>
+            <option value="Minor" ${data.category === "Minor" ? "selected" : ""}>Minor</option>
+          </select>
+        </div>
+        <div>
+          <input type="number" class="def-qty" min="1" value="${data.qty}" oninput="recalculateTotalDefects()" placeholder="Defect Qty" required />
+        </div>
+        <div>
+          <input type="text" class="def-note" placeholder="Defect location or measurement remarks" value="${escapeHtml(data.note)}" />
+        </div>
+        <div>
+          <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.defect-row').remove(); recalculateTotalDefects();">✖</button>
+        </div>
+      `;
+      container.appendChild(row);
+      recalculateTotalDefects();
+    }
+
+    function recalculateTotalDefects() {
+      let total = 0;
+      document.querySelectorAll(".defect-row .def-qty").forEach(inp => {
+        total += parseInt(inp.value, 10) || 0;
+      });
+      document.getElementById("totalDefectQty").value = total;
+      evaluateJudgment();
+    }
+
+    function evaluateJudgment() {
+      const sampleSize = parseInt(document.getElementById("sampleSize").value, 10) || 0;
+      const ac = parseInt(document.getElementById("aqlAc").value, 10) || 0;
+      const re = parseInt(document.getElementById("aqlRe").value, 10) || 1;
+      const totalDefect = parseInt(document.getElementById("totalDefectQty").value, 10) || 0;
+
+      document.getElementById("bannerSample").textContent = sampleSize;
+      document.getElementById("bannerAc").textContent = ac;
+      document.getElementById("bannerRe").textContent = re;
+
+      const pct = sampleSize > 0 ? ((totalDefect / sampleSize) * 100).toFixed(2) + "%" : "0.00%";
+      document.getElementById("defectRatePct").value = pct;
+
+      const judgmentSelect = document.getElementById("judgmentStatus");
+      const dispositionSelect = document.getElementById("dispositionAction");
+
+      if (totalDefect >= re) {
+        judgmentSelect.value = "REJECT";
+        dispositionSelect.value = "Issue NCR / Return to Vendor (RTV)";
+      } else if (totalDefect <= ac) {
+        judgmentSelect.value = "PASS";
+        dispositionSelect.value = "Release to Warehouse / Production Stock";
+      }
+      updateStatusStyle();
+    }
+
+    function updateStatusStyle() {
+      const status = document.getElementById("judgmentStatus").value;
+      const el = document.getElementById("judgmentStatus");
+      if (status === "PASS") {
+        el.style.backgroundColor = "#dcfce7";
+        el.style.color = "#166534";
+        el.style.fontWeight = "700";
+      } else if (status === "REJECT") {
+        el.style.backgroundColor = "#fee2e2";
+        el.style.color = "#991b1b";
+        el.style.fontWeight = "700";
+      } else {
+        el.style.backgroundColor = "#fef3c7";
+        el.style.color = "#92400e";
+        el.style.fontWeight = "700";
+      }
+    }
+
+    // Photo Upload & Compression
+    function handlePhotoUpload(event) {
+      const files = Array.from(event.target.files || []);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const maxDim = 720;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.78);
+            currentFormPhotos.push({
+              url: compressedDataUrl,
+              caption: file.name.replace(/\.[^/.]+$/, ""),
+              tag: "Incoming Material"
+            });
+            renderFormPhotoGallery();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = "";
+    }
+
+    function addSampleSvgPhoto() {
+      const partNo = document.getElementById("partNo").value || "PART-SAMPLE";
+      const partName = document.getElementById("partName").value || "Incoming Material Sample";
+      const lotQty = document.getElementById("lotQty").value || "500";
+      const sampleUrl = createMaterialSvgDataUrl(
+        partName,
+        `Lot Qty: ${lotQty} | AQL 1.0 Inspection`,
+        partNo,
+        "SAMPLE PHOTO",
+        "#0284c7",
+        "#f0f9ff"
+      );
+      currentFormPhotos.push({
+        url: sampleUrl,
+        caption: `Incoming Material Photo (${partNo})`,
+        tag: "Incoming Material"
+      });
+      renderFormPhotoGallery();
+    }
+
+    function renderFormPhotoGallery() {
+      const gallery = document.getElementById("formPhotoGallery");
+      gallery.innerHTML = "";
+      currentFormPhotos.forEach((photo, idx) => {
+        const card = document.createElement("div");
+        card.className = "photo-card";
+        card.innerHTML = `
+          <button type="button" class="photo-remove-btn" title="Remove Photo" onclick="removeFormPhoto(${idx})">×</button>
+          <img src="${photo.url}" alt="Incoming Material" />
+          <div class="photo-card-body">
+            <select onchange="currentFormPhotos[${idx}].tag = this.value">
+              <option value="Incoming Material" ${photo.tag === "Incoming Material" ? "selected" : ""}>📦 Incoming Material</option>
+              <option value="Defect Evidence (NG)" ${photo.tag === "Defect Evidence (NG)" ? "selected" : ""}>⚠️ Defect Evidence (NG)</option>
+              <option value="Dimensional Check" ${photo.tag === "Dimensional Check" ? "selected" : ""}>📏 Dimensional Check</option>
+              <option value="Packaging / Label" ${photo.tag === "Packaging / Label" ? "selected" : ""}>🏷️ Packaging / Label</option>
+              <option value="COA / RoHS Certificate" ${photo.tag === "COA / RoHS Certificate" ? "selected" : ""}>📄 COA / RoHS Certificate</option>
+            </select>
+            <input type="text" value="${escapeHtml(photo.caption)}" placeholder="Photo caption..." oninput="currentFormPhotos[${idx}].caption = this.value" />
+          </div>
+        `;
+        gallery.appendChild(card);
+      });
+    }
+
+    function removeFormPhoto(idx) {
+      currentFormPhotos.splice(idx, 1);
+      renderFormPhotoGallery();
+    }
+
+    function saveRecord(event) {
+      event.preventDefault();
+      const editId = document.getElementById("editRecordId").value;
+
+      const defects = [];
+      document.querySelectorAll(".defect-row").forEach(row => {
+        defects.push({
+          type: row.querySelector(".def-type").value.trim(),
+          category: row.querySelector(".def-cat").value,
+          qty: parseInt(row.querySelector(".def-qty").value, 10) || 0,
+          note: row.querySelector(".def-note").value.trim()
+        });
+      });
+
+      const recordObj = {
+        id: editId || "rec-" + Date.now(),
+        iqcNo: document.getElementById("iqcNo").value.trim(),
+        inspectionDate: document.getElementById("inspectionDate").value,
+        vendorName: document.getElementById("vendorName").value.trim(),
+        commodity: document.getElementById("commodity").value,
+        partNo: document.getElementById("partNo").value.trim(),
+        partName: document.getElementById("partName").value.trim(),
+        poDoNo: document.getElementById("poDoNo").value.trim(),
+        lotNo: document.getElementById("lotNo").value.trim(),
+        lotQty: parseInt(document.getElementById("lotQty").value, 10) || 0,
+        uom: document.getElementById("uom").value,
+        aqlMode: document.getElementById("aqlMode").value,
+        sampleCode: document.getElementById("sampleCode").value,
+        sampleSize: parseInt(document.getElementById("sampleSize").value, 10) || 0,
+        aqlAc: parseInt(document.getElementById("aqlAc").value, 10) || 0,
+        aqlRe: parseInt(document.getElementById("aqlRe").value, 10) || 1,
+        coaStatus: document.getElementById("coaStatus").value,
+        chkVisual: document.getElementById("chkVisual").value,
+        rmkVisual: document.getElementById("rmkVisual").value.trim(),
+        chkDimension: document.getElementById("chkDimension").value,
+        rmkDimension: document.getElementById("rmkDimension").value.trim(),
+        chkFunction: document.getElementById("chkFunction").value,
+        rmkFunction: document.getElementById("rmkFunction").value.trim(),
+        chkPackaging: document.getElementById("chkPackaging").value,
+        rmkPackaging: document.getElementById("rmkPackaging").value.trim(),
+        defects: defects,
+        totalDefectQty: parseInt(document.getElementById("totalDefectQty").value, 10) || 0,
+        judgmentStatus: document.getElementById("judgmentStatus").value,
+        dispositionAction: document.getElementById("dispositionAction").value,
+        sortingStatus: document.getElementById("sortingStatus").value,
+        sortingReason: document.getElementById("sortingReason").value.trim(),
+        sortingDate: document.getElementById("sortingDate").value,
+        sortingStartTime: document.getElementById("sortingStartTime").value,
+        sortingEndTime: document.getElementById("sortingEndTime").value,
+        sortingTimeTaken: document.getElementById("sortingTimeTaken").value.trim(),
+        sortedBy: document.getElementById("sortedBy").value,
+        sortingOkQty: parseInt(document.getElementById("sortingOkQty").value, 10) || 0,
+        sortingNgQty: parseInt(document.getElementById("sortingNgQty").value, 10) || 0,
+        sortingRemarks: document.getElementById("sortingRemarks").value.trim(),
+        inspectorName: document.getElementById("inspectorName").value.trim(),
+        verifiedBy: document.getElementById("verifiedBy").value.trim(),
+        ncrNo: document.getElementById("ncrNo").value.trim(),
+        remarks: document.getElementById("remarks").value.trim(),
+        photos: [...currentFormPhotos]
+      };
+
+      if (editId) {
+        const idx = records.findIndex(r => r.id === editId);
+        if (idx !== -1) records[idx] = recordObj;
+      } else {
+        records.unshift(recordObj);
+      }
+
+      saveDataToStorage();
+      refreshAllViews();
+      resetForm();
+      switchTab("tab-records");
+    }
+
+    function editRecord(id) {
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+
+      document.getElementById("editRecordId").value = rec.id;
+      document.getElementById("formHeaderTitle").textContent = `✏️ Edit IQC Record: ${rec.iqcNo} (${rec.partNo})`;
+      document.getElementById("iqcNo").value = rec.iqcNo;
+      document.getElementById("inspectionDate").value = rec.inspectionDate;
+      document.getElementById("vendorName").value = rec.vendorName;
+      document.getElementById("commodity").value = rec.commodity;
+      document.getElementById("partNo").value = rec.partNo;
+      document.getElementById("partName").value = rec.partName;
+      document.getElementById("poDoNo").value = rec.poDoNo || "";
+      document.getElementById("lotNo").value = rec.lotNo || "";
+      document.getElementById("lotQty").value = rec.lotQty;
+      document.getElementById("uom").value = rec.uom || "PCS";
+      document.getElementById("aqlMode").value = rec.aqlMode || "iso_arrow";
+      recalculateAQL();
+
+      document.getElementById("sampleCode").value = rec.sampleCode;
+      document.getElementById("sampleSize").value = rec.sampleSize;
+      document.getElementById("aqlAc").value = rec.aqlAc;
+      document.getElementById("aqlRe").value = rec.aqlRe;
+      document.getElementById("coaStatus").value = rec.coaStatus || "Complete (Attached)";
+
+      document.getElementById("chkVisual").value = rec.chkVisual || "PASS";
+      document.getElementById("rmkVisual").value = rec.rmkVisual || "";
+      document.getElementById("chkDimension").value = rec.chkDimension || "PASS";
+      document.getElementById("rmkDimension").value = rec.rmkDimension || "";
+      document.getElementById("chkFunction").value = rec.chkFunction || "PASS";
+      document.getElementById("rmkFunction").value = rec.rmkFunction || "";
+      document.getElementById("chkPackaging").value = rec.chkPackaging || "PASS";
+      document.getElementById("rmkPackaging").value = rec.rmkPackaging || "";
+
+      document.getElementById("defectRowsContainer").innerHTML = "";
+      (rec.defects || []).forEach(d => addDefectRow(d));
+      recalculateTotalDefects();
+
+      document.getElementById("judgmentStatus").value = rec.judgmentStatus;
+      document.getElementById("dispositionAction").value = rec.dispositionAction;
+      updateStatusStyle();
+
+      document.getElementById("sortingStatus").value = rec.sortingStatus || "Not Required";
+      document.getElementById("sortingReason").value = rec.sortingReason || "";
+      document.getElementById("sortingDate").value = rec.sortingDate || "";
+      document.getElementById("sortingStartTime").value = rec.sortingStartTime || "";
+      document.getElementById("sortingEndTime").value = rec.sortingEndTime || "";
+      document.getElementById("sortingTimeTaken").value = rec.sortingTimeTaken || "";
+      document.getElementById("sortedBy").value = rec.sortedBy || "N/A";
+      document.getElementById("sortingOkQty").value = rec.sortingOkQty || "";
+      document.getElementById("sortingNgQty").value = rec.sortingNgQty || "";
+      document.getElementById("sortingRemarks").value = rec.sortingRemarks || "";
+
+      document.getElementById("inspectorName").value = rec.inspectorName || "";
+      document.getElementById("verifiedBy").value = rec.verifiedBy || "";
+      document.getElementById("ncrNo").value = rec.ncrNo || "";
+      document.getElementById("remarks").value = rec.remarks || "";
+
+      currentFormPhotos = JSON.parse(JSON.stringify(rec.photos || []));
+      renderFormPhotoGallery();
+
+      switchTab("tab-form");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteRecord(id) {
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+      if (confirm(`Delete inspection record ${rec.iqcNo} (${rec.partName})?`)) {
+        records = records.filter(r => r.id !== id);
+        saveDataToStorage();
+        refreshAllViews();
+      }
+    }
+
+    function refreshAllViews() {
+      updateKpiDashboard();
+      renderRecordsTable();
+      renderVendorScorecard();
+    }
+
+    function updateKpiDashboard() {
+      const totalLots = records.length;
+      const totalQty = records.reduce((acc, r) => acc + (r.lotQty || 0), 0);
+      const passLots = records.filter(r => r.judgmentStatus === "PASS").length;
+      const rejectLots = records.filter(r => r.judgmentStatus === "REJECT").length;
+      const sortingLots = records.filter(r => r.sortingStatus && r.sortingStatus !== "Not Required").length;
+      const totalDefects = records.reduce((acc, r) => acc + (r.totalDefectQty || 0), 0);
+      const passRate = totalLots > 0 ? ((passLots / totalLots) * 100).toFixed(1) + "%" : "0%";
+
+      let totalMins = 0;
+      records.forEach(r => {
+        if (r.sortingStartTime && r.sortingEndTime) {
+          const [sh, sm] = r.sortingStartTime.split(":").map(Number);
+          const [eh, em] = r.sortingEndTime.split(":").map(Number);
+          let d = (eh * 60 + em) - (sh * 60 + sm);
+          if (d < 0) d += 24 * 60;
+          totalMins += d;
+        }
+      });
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      const timeSummary = totalMins > 0 ? `${hrs}h ${mins}m (${totalMins} mins) total sorting` : "No sorting time logged";
+
+      document.getElementById("kpiTotalLots").textContent = totalLots.toLocaleString();
+      document.getElementById("kpiTotalQty").textContent = `${totalQty.toLocaleString()} total units inspected`;
+      document.getElementById("kpiPassRate").textContent = passRate;
+      document.getElementById("kpiPassCount").textContent = `${passLots} of ${totalLots} lots accepted`;
+      document.getElementById("kpiRejectCount").textContent = rejectLots.toLocaleString();
+      document.getElementById("kpiDefectTotal").textContent = `${totalDefects.toLocaleString()} total defects found`;
+      document.getElementById("kpiSortingCount").textContent = sortingLots.toLocaleString();
+      document.getElementById("kpiSortingTime").textContent = timeSummary;
+    }
+
+    function renderRecordsTable() {
+      const q = (document.getElementById("searchInput").value || "").toLowerCase();
+      const comm = document.getElementById("filterCommodity").value;
+      const st = document.getElementById("filterStatus").value;
+      const sortFilter = document.getElementById("filterSorting").value;
+
+      const filtered = records.filter(r => {
+        const matchQ =
+          !q ||
+          (r.iqcNo || "").toLowerCase().includes(q) ||
+          (r.vendorName || "").toLowerCase().includes(q) ||
+          (r.partNo || "").toLowerCase().includes(q) ||
+          (r.partName || "").toLowerCase().includes(q) ||
+          (r.poDoNo || "").toLowerCase().includes(q) ||
+          (r.lotNo || "").toLowerCase().includes(q);
+        const matchComm = !comm || r.commodity === comm;
+        const matchSt = !st || r.judgmentStatus === st;
+        const hasSorting = r.sortingStatus && r.sortingStatus !== "Not Required";
+        const matchSort =
+          !sortFilter ||
+          (sortFilter === "SORTED_ONLY" && hasSorting) ||
+          (sortFilter === "NO_SORTING" && !hasSorting);
+        return matchQ && matchComm && matchSt && matchSort;
+      });
+
+      document.getElementById("recordCountLabel").textContent = `Showing ${filtered.length} of ${records.length} records`;
+
+      const tbody = document.getElementById("recordsTableBody");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:24px; color:var(--text-muted);">No matching inspection records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const defectSummary = (r.defects && r.defects.length > 0)
+          ? r.defects.map(d => `<div>• <strong>${escapeHtml(d.type)}</strong> (${d.category}: ${d.qty})</div>`).join("")
+          : `<span style="color:var(--pass-text); font-weight:600;">No Defects (0)</span>`;
+
+        const hasSorting = r.sortingStatus && r.sortingStatus !== "Not Required";
+        let sortingHtml = `
+          <div style="font-size:11.5px; color:var(--text-muted);">No 100% Sorting Yet</div>
+          <button class="btn btn-sort btn-sm" style="margin-top:4px; padding:3px 8px; font-size:11px;" onclick="openQuickSortModal('${r.id}')">➕ Add 100% Sort</button>
+        `;
+        if (hasSorting) {
+          const timeRange = (r.sortingStartTime && r.sortingEndTime) ? ` (${r.sortingStartTime}–${r.sortingEndTime})` : "";
+          sortingHtml = `
+            <div style="font-size:11.5px;">
+              <div style="font-weight:700; color:var(--sort-text);">⚡ ${escapeHtml(r.sortingStatus)}</div>
+              ${r.sortingReason ? `<div style="font-size:11px; color:var(--text-muted);">Reason: ${escapeHtml(r.sortingReason)}</div>` : ""}
+              <div>📅 <strong>When:</strong> ${escapeHtml(r.sortingDate || "-")}</div>
+              <div>⏱️ <strong>Time:</strong> ${escapeHtml(r.sortingTimeTaken || "-")}${escapeHtml(timeRange)}</div>
+              ${(r.sortingOkQty || r.sortingNgQty) ? `<div style="font-size:11px; font-weight:700; color:var(--primary);">OK: ${r.sortingOkQty || 0} | NG: <span style="color:var(--reject-text);">${r.sortingNgQty || 0}</span></div>` : ""}
+            </div>
+          `;
+        }
+
+        const photosHtml = (r.photos && r.photos.length > 0)
+          ? `<div class="thumb-stack">
+              ${r.photos.slice(0, 2).map(p => `<img src="${p.url}" class="thumb-mini" title="${escapeHtml(p.caption)}" onclick="openReportModal('${r.id}')" />`).join("")}
+              ${r.photos.length > 2 ? `<span style="font-size:11px; font-weight:700; color:var(--primary);">+${r.photos.length - 2}</span>` : ""}
+            </div>`
+          : `<span style="font-size:11.5px; color:var(--text-muted);">No Photos</span>`;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--primary);">${escapeHtml(r.iqcNo)}</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">📅 ${escapeHtml(r.inspectionDate)}</div>
+              ${r.ncrNo ? `<div style="font-size:11px; color:var(--reject-text); font-weight:700;">🚨 ${escapeHtml(r.ncrNo)}</div>` : ""}
+            </td>
+            <td>
+              <div style="font-weight:700;">${escapeHtml(r.vendorName)}</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">PO/DO: ${escapeHtml(r.poDoNo || "-")}</div>
+            </td>
+            <td>
+              <div style="font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase;">${escapeHtml(r.commodity)}</div>
+              <div style="font-weight:700;">${escapeHtml(r.partNo)}</div>
+              <div style="font-size:12px; color:var(--text-muted);">${escapeHtml(r.partName)}</div>
+            </td>
+            <td class="num-col"><strong>${(r.lotQty || 0).toLocaleString()}</strong> ${escapeHtml(r.uom || "PCS")}</td>
+            <td class="num-col">
+              <strong>${(r.sampleSize || 0).toLocaleString()}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">Code ${escapeHtml(r.sampleCode || "-")}</div>
+            </td>
+            <td class="num-col">
+              <span style="color:var(--pass-text); font-weight:700;">${r.aqlAc}</span> /
+              <span style="color:var(--reject-text); font-weight:700;">${r.aqlRe}</span>
+            </td>
+            <td class="num-col" style="font-weight:800; color:${r.totalDefectQty > r.aqlAc ? 'var(--reject-text)' : 'var(--text)'};">
+              ${r.totalDefectQty}
+            </td>
+            <td style="font-size:12px; max-width:190px;">${defectSummary}</td>
+            <td style="min-width:185px;">${sortingHtml}</td>
+            <td>${photosHtml}</td>
+            <td>
+              <div><span class="status-badge status-${r.judgmentStatus}">${r.judgmentStatus}</span></div>
+              ${hasSorting ? `<div class="badge-sorted">✓ 100% Checked</div>` : ""}
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">👤 ${escapeHtml(r.inspectorName || "-")}</div>
+            </td>
+            <td>
+              <div style="display:flex; flex-direction:column; gap:5px;">
+                <button class="btn btn-sort btn-sm" title="Add or Edit 100% Sorting / Post-Pass Check" onclick="openQuickSortModal('${r.id}')">⚡ 100% Sort / Edit</button>
+                <div style="display:flex; gap:5px;">
+                  <button class="btn btn-outline btn-sm" title="Edit Full Inspection Record" onclick="editRecord('${r.id}')">✏️ Edit</button>
+                  <button class="btn btn-outline btn-sm" title="View & Print Report" onclick="openReportModal('${r.id}')">🖨️ Report</button>
+                  <button class="btn btn-outline btn-sm" title="Delete" onclick="deleteRecord('${r.id}')">🗑️</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderVendorScorecard() {
+      const map = {};
+      records.forEach(r => {
+        const v = r.vendorName || "Unknown Vendor";
+        if (!map[v]) {
+          map[v] = { vendorName: v, commodity: r.commodity, lots: 0, qty: 0, pass: 0, reject: 0, sorted: 0 };
+        }
+        map[v].lots += 1;
+        map[v].qty += r.lotQty || 0;
+        if (r.judgmentStatus === "PASS") map[v].pass += 1;
+        else if (r.judgmentStatus === "REJECT") map[v].reject += 1;
+        if (r.sortingStatus && r.sortingStatus !== "Not Required") map[v].sorted += 1;
+      });
+
+      const list = Object.values(map);
+      const tbody = document.getElementById("vendorScorecardBody");
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px;">No vendor data available.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        const lar = item.lots > 0 ? ((item.pass / item.lots) * 100).toFixed(1) : "0.0";
+        let grade = `<span class="status-badge status-PASS">Grade A (Preferred)</span>`;
+        if (parseFloat(lar) < 70) {
+          grade = `<span class="status-badge status-REJECT">Grade C (Audit / SCAR Req.)</span>`;
+        } else if (parseFloat(lar) < 95 || item.sorted > 0) {
+          grade = `<span class="status-badge status-HOLD">Grade B (Monitor Closely)</span>`;
+        }
+        return `
+          <tr>
+            <td><strong>${escapeHtml(item.vendorName)}</strong></td>
+            <td>${escapeHtml(item.commodity)}</td>
+            <td class="num-col">${item.lots}</td>
+            <td class="num-col">${item.qty.toLocaleString()}</td>
+            <td class="num-col" style="color:var(--pass-text); font-weight:700;">${item.pass}</td>
+            <td class="num-col" style="color:var(--reject-text); font-weight:700;">${item.reject}</td>
+            <td class="num-col" style="color:var(--sort-text); font-weight:700;">${item.sorted}</td>
+            <td class="num-col"><strong>${lar}%</strong></td>
+            <td>${grade}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function openReportModal(id) {
+      const r = records.find(x => x.id === id);
+      if (!r) return;
+
+      const defectsRows = (r.defects && r.defects.length > 0)
+        ? r.defects.map((d, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td><strong>${escapeHtml(d.type)}</strong></td>
+              <td>${escapeHtml(d.category)}</td>
+              <td class="num-col"><strong>${d.qty}</strong></td>
+              <td>${escapeHtml(d.note || "-")}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="5" style="text-align:center; color:var(--pass-text); font-weight:700;">No defects found during AQL sampling (0 Defects).</td></tr>`;
+
+      const photosSection = (r.photos && r.photos.length > 0)
+        ? `<div class="report-photos">
+            ${r.photos.map(p => `
+              <div class="report-photo-box">
+                <img src="${p.url}" alt="Incoming Photo" />
+                <div style="font-size:11px; font-weight:700; color:var(--primary); margin-top:4px;">${escapeHtml(p.tag || "Incoming Material")}</div>
+                <div style="font-size:11.5px; color:#334155;">${escapeHtml(p.caption || "")}</div>
+              </div>
+            `).join("")}
+          </div>`
+        : `<p style="font-size:12px; color:#64748b;">No photos attached.</p>`;
+
+      const sortingWindow = (r.sortingStartTime && r.sortingEndTime) ? `${r.sortingStartTime} – ${r.sortingEndTime}` : "-";
+
+      const body = document.getElementById("reportModalBody");
+      body.innerHTML = `
+        <div class="report-sheet">
+          <div class="report-header">
+            <div>
+              <div style="font-size:18px; font-weight:800; letter-spacing:0.3px;">INCOMING QUALITY CONTROL (IQC) INSPECTION REPORT</div>
+              <div style="font-size:12px; color:#475569;">Sampling Plan: ISO 2859-1 / ANSI/ASQ Z1.4 — General Inspection Level II (AQL 1.0)</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="status-badge status-${r.judgmentStatus}" style="font-size:14px; padding:6px 14px;">JUDGMENT: ${r.judgmentStatus}</span>
+              <div style="font-size:12px; font-weight:700; margin-top:4px;">Ref No.: ${escapeHtml(r.iqcNo)}</div>
+            </div>
+          </div>
+
+          <div class="report-grid">
+            <div class="report-cell"><span class="lbl">Inspection Date</span><span class="val">${escapeHtml(r.inspectionDate)}</span></div>
+            <div class="report-cell"><span class="lbl">Vendor Name</span><span class="val">${escapeHtml(r.vendorName)}</span></div>
+            <div class="report-cell"><span class="lbl">Commodity</span><span class="val">${escapeHtml(r.commodity)}</span></div>
+            <div class="report-cell"><span class="lbl">PO / DO No.</span><span class="val">${escapeHtml(r.poDoNo || "-")}</span></div>
+
+            <div class="report-cell"><span class="lbl">Part No.</span><span class="val">${escapeHtml(r.partNo)}</span></div>
+            <div class="report-cell"><span class="lbl">Part Description</span><span class="val">${escapeHtml(r.partName)}</span></div>
+            <div class="report-cell"><span class="lbl">Supplier Lot / Batch</span><span class="val">${escapeHtml(r.lotNo || "-")}</span></div>
+            <div class="report-cell"><span class="lbl">COA / RoHS Status</span><span class="val">${escapeHtml(r.coaStatus || "-")}</span></div>
+
+            <div class="report-cell"><span class="lbl">Lot Quantity (Lot Qty)</span><span class="val">${(r.lotQty || 0).toLocaleString()} ${escapeHtml(r.uom || "PCS")}</span></div>
+            <div class="report-cell"><span class="lbl">Sample Size (AQL 1.0)</span><span class="val">${(r.sampleSize || 0).toLocaleString()} (Code ${escapeHtml(r.sampleCode || "-")})</span></div>
+            <div class="report-cell"><span class="lbl">AQL 1.0 Limits (Ac / Re)</span><span class="val">Ac = ${r.aqlAc} | Re = ${r.aqlRe}</span></div>
+            <div class="report-cell"><span class="lbl">Total Defects Found</span><span class="val" style="color:${r.totalDefectQty >= r.aqlRe ? '#991b1b' : '#166534'};">${r.totalDefectQty} units</span></div>
+          </div>
+
+          <div style="font-weight:700; font-size:12.5px; text-transform:uppercase; margin:12px 0 6px; color:#0f4c81;">1. Inspection Parameter Checklist Results</div>
+          <table class="param-table" style="margin-bottom:14px;">
+            <thead>
+              <tr>
+                <th>Inspection Parameter</th>
+                <th>Result</th>
+                <th>Specification / Measurement Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Visual / Cosmetic Inspection</td><td><strong>${escapeHtml(r.chkVisual)}</strong></td><td>${escapeHtml(r.rmkVisual || "-")}</td></tr>
+              <tr><td>Dimensional Inspection</td><td><strong>${escapeHtml(r.chkDimension)}</strong></td><td>${escapeHtml(r.rmkDimension || "-")}</td></tr>
+              <tr><td>Fit & Functional Check</td><td><strong>${escapeHtml(r.chkFunction)}</strong></td><td>${escapeHtml(r.rmkFunction || "-")}</td></tr>
+              <tr><td>Packaging & Labeling Check</td><td><strong>${escapeHtml(r.chkPackaging)}</strong></td><td>${escapeHtml(r.rmkPackaging || "-")}</td></tr>
+            </tbody>
+          </table>
+
+          <div style="font-weight:700; font-size:12.5px; text-transform:uppercase; margin:12px 0 6px; color:#0f4c81;">2. Defect Breakdown Details</div>
+          <table class="param-table" style="margin-bottom:14px;">
+            <thead>
+              <tr>
+                <th style="width:40px;">No</th>
+                <th>Defect Type</th>
+                <th>Category</th>
+                <th class="num-col">Defect Qty</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>${defectsRows}</tbody>
+          </table>
+
+          <div style="font-weight:700; font-size:12.5px; text-transform:uppercase; margin:12px 0 6px; color:#0f4c81;">3. 100% Sorting / Post-Inspection Check Record (When & Time Taken)</div>
+          <div class="report-grid" style="margin-bottom:14px;">
+            <div class="report-cell"><span class="lbl">100% Sorting Status</span><span class="val">${escapeHtml(r.sortingStatus || "Not Required")}</span></div>
+            <div class="report-cell"><span class="lbl">Sorting Date (When)</span><span class="val">${escapeHtml(r.sortingDate || "-")} (${escapeHtml(sortingWindow)})</span></div>
+            <div class="report-cell"><span class="lbl">Time Taken (Duration)</span><span class="val">${escapeHtml(r.sortingTimeTaken || "-")}</span></div>
+            <div class="report-cell"><span class="lbl">Sorted By & Result</span><span class="val">${escapeHtml(r.sortedBy || "N/A")} (OK: ${r.sortingOkQty || 0} / NG: ${r.sortingNgQty || 0})</span></div>
+            <div class="report-cell" style="grid-column: span 2;"><span class="lbl">Sorting Trigger / Reason</span><span class="val">${escapeHtml(r.sortingReason || "-")}</span></div>
+            <div class="report-cell" style="grid-column: span 2;"><span class="lbl">100% Sorting Findings</span><span class="val">${escapeHtml(r.sortingRemarks || "-")}</span></div>
+          </div>
+
+          <div style="font-weight:700; font-size:12.5px; text-transform:uppercase; margin:12px 0 6px; color:#0f4c81;">4. Incoming Material & Inspection Evidence Photos</div>
+          ${photosSection}
+
+          <div style="margin-top:14px; padding:10px; background:#f8fafc; border:1px solid #cbd5e1; font-size:12.5px;">
+            <div><strong>Lot Disposition Action:</strong> ${escapeHtml(r.dispositionAction || "-")} ${r.ncrNo ? `| <strong>NCR Ref No.:</strong> ${escapeHtml(r.ncrNo)}` : ""}</div>
+            <div style="margin-top:4px;"><strong>Inspector Remarks:</strong> ${escapeHtml(r.remarks || "-")}</div>
+          </div>
+
+          <div class="report-signatures">
+            <div class="sig-box">
+              <div style="font-weight:700;">${escapeHtml(r.inspectorName || "_________________")}</div>
+              <div style="color:#475569;">Inspected By (IQC Inspector)</div>
+            </div>
+            <div class="sig-box">
+              <div style="font-weight:700;">${escapeHtml(r.verifiedBy || "_________________")}</div>
+              <div style="color:#475569;">Verified By (QA Engineer / Leader)</div>
+            </div>
+            <div class="sig-box">
+              <div style="font-weight:700;">_________________</div>
+              <div style="color:#475569;">Approved By (QA Manager)</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("reportModal").classList.add("open");
+    }
+
+    function closeReportModal() {
+      document.getElementById("reportModal").classList.remove("open");
+    }
+
+    function exportCSV() {
+      const headers = [
+        "IQC No", "Inspection Date", "Vendor Name", "Commodity", "Part No", "Part Description",
+        "PO/DO No", "Lot No", "Lot Qty", "UOM", "Sample Code", "Sample Size (AQL 1.0)",
+        "Ac", "Re", "Total Defect Qty", "Defect Details", "Judgment", "Disposition Action",
+        "100% Sorting Status", "Sorting Reason", "Sorting Date (When)", "Sorting Start Time", "Sorting End Time",
+        "Sorting Time Taken", "Sorted By", "Sorted OK Qty", "Sorted NG Qty", "Sorting Remarks",
+        "NCR No", "Inspected By", "Verified By", "Remarks"
+      ];
+      const rows = records.map(r => {
+        const defText = (r.defects || []).map(d => `${d.type} (${d.category}:${d.qty})`).join("; ");
+        return [
+          r.iqcNo, r.inspectionDate, r.vendorName, r.commodity, r.partNo, r.partName,
+          r.poDoNo, r.lotNo, r.lotQty, r.uom, r.sampleCode, r.sampleSize,
+          r.aqlAc, r.aqlRe, r.totalDefectQty, defText, r.judgmentStatus, r.dispositionAction,
+          r.sortingStatus || "Not Required", r.sortingReason || "", r.sortingDate || "", r.sortingStartTime || "", r.sortingEndTime || "",
+          r.sortingTimeTaken || "", r.sortedBy || "", r.sortingOkQty || 0, r.sortingNgQty || 0, r.sortingRemarks || "",
+          r.ncrNo, r.inspectorName, r.verifiedBy, r.remarks
+        ].map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(",");
+      });
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `IQC_Incoming_Inspection_Record_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(records, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `IQC_System_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // PWA Manifest & Install Prompt Setup
+    let deferredInstallPrompt = null;
+
+    function initPwaSupport() {
+      const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+        <rect width="512" height="512" rx="96" fill="#0f4c81"/>
+        <rect x="44" y="44" width="424" height="424" rx="72" fill="#0f172a" stroke="#38bdf8" stroke-width="12"/>
+        <text x="256" y="245" font-family="Arial, sans-serif" font-size="120" font-weight="900" fill="#38bdf8" text-anchor="middle">IQC</text>
+        <text x="256" y="355" font-family="Arial, sans-serif" font-size="72" font-weight="800" fill="#ffffff" text-anchor="middle">AQL 1.0</text>
+      </svg>`;
+      const iconUrl = "data:image/svg+xml;utf8," + encodeURIComponent(iconSvg);
+
+      const appleIcon = document.createElement("link");
+      appleIcon.rel = "apple-touch-icon";
+      appleIcon.href = iconUrl;
+      document.head.appendChild(appleIcon);
+
+      const manifest = {
+        name: "IQC Incoming Inspection System (AQL 1.0)",
+        short_name: "IQC 1.0",
+        description: "Incoming Quality Control Inspection & 100% Sorting Record System",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#f1f5f9",
+        theme_color: "#0f4c81",
+        icons: [
+          { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+        ]
+      };
+      const manifestBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+      const manifestLink = document.createElement("link");
+      manifestLink.rel = "manifest";
+      manifestLink.href = URL.createObjectURL(manifestBlob);
+      document.head.appendChild(manifestLink);
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        const btn = document.getElementById("nativePromptBtn");
+        if (btn) btn.style.display = "inline-flex";
+      });
+    }
+
+    function openAppInstallModal() {
+      document.getElementById("appInstallModal").classList.add("open");
+    }
+
+    function closeAppInstallModal() {
+      document.getElementById("appInstallModal").classList.remove("open");
+    }
+
+    async function triggerNativeInstall() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById("nativePromptBtn").style.display = "none";
+      closeAppInstallModal();
+    }
+
+    // Initialize on load
+    window.addEventListener("DOMContentLoaded", () => {
+      initPwaSupport();
+      loadCloudConfig();
+      loadData();
+      resetForm();
+      syncFromCloud(false);
+    });
+  </script>
+</body>
+</html>
